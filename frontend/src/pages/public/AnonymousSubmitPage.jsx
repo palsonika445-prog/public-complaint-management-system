@@ -5,7 +5,8 @@ import api from '../../services/api'
 import MapPicker from '../../components/MapPicker'
 import DuplicateModal from '../../components/DuplicateModal'
 import AddCityModal from '../../components/AddCityModal'
-import { EyeOff, AlertTriangle, Copy, Check, ArrowRight, ShieldCheck } from 'lucide-react'
+import { analyzeComplaintUrgency } from '../../utils/aiTriage'
+import { EyeOff, AlertTriangle, Copy, Check, ArrowRight, ShieldCheck, Zap } from 'lucide-react'
 
 const AnonymousSubmitPage = () => {
   const { t } = useTranslation()
@@ -14,6 +15,7 @@ const AnonymousSubmitPage = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [showAddCityModal, setShowAddCityModal] = useState(false)
+  const [aiTriage, setAiTriage] = useState({ isEmergency: false })
 
   // Form fields
   const [title, setTitle] = useState('')
@@ -35,6 +37,15 @@ const AnonymousSubmitPage = () => {
   // Anonymous success result
   const [submissionResult, setSubmissionResult] = useState(null)
   const [copied, setCopied] = useState(false)
+
+  // Real-time AI Hazard & Urgency Triage
+  useEffect(() => {
+    const result = analyzeComplaintUrgency(title, description)
+    setAiTriage(result)
+    if (result.isEmergency && result.suggestedPriority) {
+      setPriority(result.suggestedPriority)
+    }
+  }, [title, description])
 
   useEffect(() => {
     const fetchMeta = async () => {
@@ -331,6 +342,33 @@ const AnonymousSubmitPage = () => {
                     onChange={(e) => setDescription(e.target.value)}
                   />
                 </div>
+
+                {/* AI Real-time Safety Triage Alert */}
+                {aiTriage.isEmergency && (
+                  <div className="p-3 bg-red-50 border border-red-300 rounded-3 mb-3 shadow-xs">
+                    <div className="d-flex align-items-start gap-2.5">
+                      <div className="p-1.5 bg-danger text-white rounded-circle mt-0.5 d-inline-flex">
+                        <Zap size={16} />
+                      </div>
+                      <div>
+                        <div className="d-flex align-items-center gap-2 flex-wrap">
+                          <strong className="text-danger small">
+                            ⚡ AI Safety Triage: Hazard Detected!
+                          </strong>
+                          <span className="badge bg-danger text-white rounded-pill px-2 py-0.5" style={{ fontSize: '0.68rem' }}>
+                            {aiTriage.hazardType}
+                          </span>
+                          <span className="badge bg-dark text-white rounded-pill px-2 py-0.5" style={{ fontSize: '0.68rem' }}>
+                            Auto Priority: CRITICAL (6h SLA)
+                          </span>
+                        </div>
+                        <div className="text-danger small mt-1" style={{ fontSize: '0.78rem' }}>
+                          Matched hazard keyword: <strong>"{aiTriage.matchedKeyword}"</strong> &bull; {aiTriage.reason}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Map Picker */}
                 <div className="mb-3">

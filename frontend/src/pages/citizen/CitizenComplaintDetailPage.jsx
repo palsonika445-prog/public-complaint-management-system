@@ -5,7 +5,10 @@ import api from '../../services/api'
 import StatusBadge from '../../components/StatusBadge'
 import PriorityBadge from '../../components/PriorityBadge'
 import Timeline from '../../components/Timeline'
-import { ArrowLeft, Star, AlertTriangle, CheckCircle, RefreshCcw, MapPin, Calendar, Clock, Image as ImageIcon, ShieldCheck } from 'lucide-react'
+import ResolutionEvidenceCard from '../../components/ResolutionEvidenceCard'
+import GrievanceReceiptModal from '../../components/GrievanceReceiptModal'
+import WhatsAppNotificationToast from '../../components/WhatsAppNotificationToast'
+import { ArrowLeft, Star, AlertTriangle, CheckCircle, RefreshCcw, MapPin, Calendar, Clock, Image as ImageIcon, ShieldCheck, Printer, MessageSquare } from 'lucide-react'
 
 const CitizenComplaintDetailPage = () => {
   const { id } = useParams()
@@ -13,6 +16,8 @@ const CitizenComplaintDetailPage = () => {
   const [complaint, setComplaint] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [showReceiptModal, setShowReceiptModal] = useState(false)
+  const [showWhatsAppToast, setShowWhatsAppToast] = useState(false)
 
   // Feedback Modal state
   const [showFeedbackModal, setShowFeedbackModal] = useState(false)
@@ -103,10 +108,32 @@ const CitizenComplaintDetailPage = () => {
 
   return (
     <div className="container py-2">
-      <Link to="/citizen/complaints" className="btn btn-link text-decoration-none text-muted p-0 mb-3 d-inline-flex align-items-center gap-1 small">
-        <ArrowLeft size={14} />
-        Back to My Complaints
-      </Link>
+      <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <Link to="/citizen/complaints" className="btn btn-link text-decoration-none text-muted p-0 d-inline-flex align-items-center gap-1 small">
+          <ArrowLeft size={14} />
+          Back to My Complaints
+        </Link>
+        <div className="d-flex align-items-center gap-2">
+          <button
+            type="button"
+            className="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-1.5 py-1 px-2.5 rounded-pill shadow-xs"
+            style={{ fontSize: '0.78rem' }}
+            onClick={() => setShowWhatsAppToast(true)}
+          >
+            <MessageSquare size={14} className="text-success" />
+            <span>📲 WhatsApp Live Alert</span>
+          </button>
+          <button
+            type="button"
+            className="btn btn-sm btn-outline-dark d-inline-flex align-items-center gap-1.5 py-1 px-2.5 rounded-pill shadow-xs"
+            style={{ fontSize: '0.78rem' }}
+            onClick={() => setShowReceiptModal(true)}
+          >
+            <Printer size={14} />
+            <span>🖨️ Official Receipt (पावती)</span>
+          </button>
+        </div>
+      </div>
 
       <div className="row g-4">
         {/* Main Details */}
@@ -219,6 +246,9 @@ const CitizenComplaintDetailPage = () => {
               </div>
             )}
           </div>
+
+          {/* Before & After Resolution Proof Evidence Card */}
+          <ResolutionEvidenceCard complaint={complaint} />
         </div>
 
         {/* Sidebar Actions & Timeline */}
@@ -379,6 +409,20 @@ const CitizenComplaintDetailPage = () => {
           </div>
         </div>
       )}
+
+      {/* Official Grievance Acknowledgement Receipt Modal */}
+      <GrievanceReceiptModal
+        isOpen={showReceiptModal}
+        onClose={() => setShowReceiptModal(false)}
+        complaint={complaint}
+      />
+
+      {/* WhatsApp Civic Notification Toast */}
+      <WhatsAppNotificationToast
+        complaint={complaint}
+        show={showWhatsAppToast}
+        onClose={() => setShowWhatsAppToast(false)}
+      />
     </div>
   )
 }
