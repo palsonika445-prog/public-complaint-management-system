@@ -6,19 +6,26 @@ import { useAuth } from '../../context/AuthContext'
 import StatCard from '../../components/StatCard'
 import StatusBadge from '../../components/StatusBadge'
 import PriorityBadge from '../../components/PriorityBadge'
-import { PlusCircle, FileText, Clock, CheckCircle, AlertTriangle, ArrowRight, Bell } from 'lucide-react'
+import { PlusCircle, FileText, Clock, CheckCircle, AlertTriangle, ArrowRight, Bell, MapPin, Check } from 'lucide-react'
 
 const CitizenDashboard = () => {
   const { t } = useTranslation()
-  const { user } = useAuth()
+  const { user, updateProfile } = useAuth()
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [cities, setCities] = useState([])
+  const [switchingCity, setSwitchingCity] = useState(false)
+  const [switchSuccessMsg, setSwitchSuccessMsg] = useState(null)
 
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const res = await api.get('/citizen/dashboard')
-        setData(res.data)
+        const [dashRes, citiesRes] = await Promise.all([
+          api.get('/citizen/dashboard'),
+          api.get('/cities')
+        ])
+        setData(dashRes.data)
+        setCities(citiesRes.data.cities || [])
       } catch (err) {
         console.error(err)
       } finally {
@@ -27,6 +34,19 @@ const CitizenDashboard = () => {
     }
     fetchDashboard()
   }, [])
+
+  const handleCitySwitch = async (cityId, cityName) => {
+    try {
+      setSwitchingCity(true)
+      await updateProfile({ city_id: cityId })
+      setSwitchSuccessMsg(`Active municipality changed to ${cityName}`)
+      setTimeout(() => setSwitchSuccessMsg(null), 4000)
+    } catch (err) {
+      console.error('Failed to change municipality', err)
+    } finally {
+      setSwitchingCity(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -48,9 +68,42 @@ const CitizenDashboard = () => {
           <h4 className="fw-bold text-slate-900 mb-1">
             {t('dashboard.welcome')}, {user?.full_name}!
           </h4>
-          <p className="text-muted small mb-0">
-            Registered with <strong>{user?.city_name || 'Municipal Corporation'}</strong> &bull; Citizen Portal
-          </p>
+          <div className="d-flex align-items-center gap-2 flex-wrap">
+            <span className="text-muted small">
+              Default Municipality: <strong>{user?.city_name || 'Not Selected'}</strong>
+            </span>
+            <div className="dropdown">
+              <button
+                className="btn btn-xs btn-outline-primary py-0.5 px-2 dropdown-toggle small d-inline-flex align-items-center gap-1"
+                type="button"
+                data-bs-toggle="dropdown"
+                disabled={switchingCity}
+              >
+                <MapPin size={12} />
+                <span>बदलें / Switch</span>
+              </button>
+              <ul className="dropdown-menu shadow-sm">
+                <li className="dropdown-header small text-muted">Select Municipality</li>
+                {cities.map((city) => (
+                  <li key={city.id}>
+                    <button
+                      className={`dropdown-item small d-flex justify-content-between align-items-center ${user?.city_id === city.id ? 'fw-bold text-primary active bg-light' : ''}`}
+                      onClick={() => handleCitySwitch(city.id, city.name)}
+                    >
+                      <span>{city.name} ({city.state})</span>
+                      {user?.city_id === city.id && <Check size={14} className="text-primary ms-2" />}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <span className="text-muted small">&bull; Citizen Portal</span>
+          </div>
+          {switchSuccessMsg && (
+            <div className="alert alert-success py-1 px-2.5 small mt-2 mb-0 d-inline-block">
+              ✓ {switchSuccessMsg}
+            </div>
+          )}
         </div>
         <Link to="/citizen/submit" className="btn btn-civic shadow-sm d-inline-flex align-items-center gap-2">
           <PlusCircle size={18} />
@@ -121,7 +174,7 @@ const CitizenDashboard = () => {
                       </div>
                       <h6 className="fw-semibold text-slate-900 mb-1">{c.title}</h6>
                       <small className="text-muted">
-                        {c.category_name} &bull; {new Date(c.created_at).toLocaleDateString()}
+                        {c.category_name} {c.city_name && <span>&bull; 📍 {c.city_name}</span>} &bull; {new Date(c.created_at).toLocaleDateString()}
                       </small>
                     </div>
                     <Link to={`/complaints/${c.id}`} className="btn btn-sm btn-outline-primary">

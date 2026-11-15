@@ -121,7 +121,14 @@ const MyComplaintsPage = () => {
                   <td className="fw-bold text-primary small">{c.complaint_number}</td>
                   <td>
                     <div className="fw-semibold text-slate-800 text-truncate" style={{ maxWidth: 220 }}>{c.title}</div>
-                    {c.landmark && <small className="text-muted text-truncate d-block" style={{ maxWidth: 220 }}>📍 {c.landmark}</small>}
+                    <div className="d-flex align-items-center gap-1 mt-0.5">
+                      {c.city_name && (
+                        <span className="badge bg-light text-primary border" style={{ fontSize: '0.68rem' }}>
+                          📍 {c.city_name}
+                        </span>
+                      )}
+                      {c.landmark && <small className="text-muted text-truncate" style={{ maxWidth: 140 }}>&bull; {c.landmark}</small>}
+                    </div>
                   </td>
                   <td><span className="badge bg-light text-secondary border small">{c.category_name}</span></td>
                   <td><PriorityBadge priority={c.priority} /></td>

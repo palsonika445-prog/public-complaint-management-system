@@ -1,15 +1,37 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../context/AuthContext'
 import { useNotifications } from '../context/NotificationContext'
-import { Globe, Bell, User, LogOut, ShieldAlert, FileText, Check } from 'lucide-react'
+import api from '../services/api'
+import { Globe, Bell, User, LogOut, ShieldAlert, FileText, Check, MapPin } from 'lucide-react'
 
 const Navbar = () => {
   const { t, i18n } = useTranslation()
-  const { user, logout } = useAuth()
+  const { user, logout, updateProfile } = useAuth()
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications()
   const navigate = useNavigate()
+  const [cities, setCities] = useState([])
+  const [switchingCity, setSwitchingCity] = useState(false)
+
+  useEffect(() => {
+    if (user && user.role === 'citizen') {
+      api.get('/cities').then(res => {
+        setCities(res.data.cities || [])
+      }).catch(err => console.error(err))
+    }
+  }, [user])
+
+  const handleSwitchCity = async (cityId) => {
+    try {
+      setSwitchingCity(true)
+      await updateProfile({ city_id: cityId })
+    } catch (err) {
+      console.error('Failed to switch municipality', err)
+    } finally {
+      setSwitchingCity(false)
+    }
+  }
 
   const handleLanguageChange = (lang) => {
     i18n.changeLanguage(lang)
@@ -106,6 +128,46 @@ const Navbar = () => {
                 </li>
               </ul>
             </div>
+
+            {/* Municipality Quick Switcher for Citizens */}
+            {user && user.role === 'citizen' && (
+              <div className="dropdown">
+                <button
+                  className="btn btn-sm btn-outline-light dropdown-toggle d-flex align-items-center gap-1.5"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  disabled={switchingCity}
+                  title="Switch Active Municipality / नगर पालिका बदलें"
+                >
+                  <MapPin size={14} className="text-warning" />
+                  <span className="small fw-medium d-none d-sm-inline">
+                    {user.city_name || 'Select Municipality'}
+                  </span>
+                  <span className="small fw-medium d-inline d-sm-none">
+                    {user.city_name ? user.city_name.split(' ')[0] : 'City'}
+                  </span>
+                </button>
+                <ul className="dropdown-menu dropdown-menu-end shadow-sm" style={{ minWidth: '240px' }}>
+                  <li className="dropdown-header small text-muted">
+                    📍 Switch Municipality / नगर पालिका बदलें
+                  </li>
+                  {cities.map((city) => (
+                    <li key={city.id}>
+                      <button
+                        className={`dropdown-item small d-flex justify-content-between align-items-center py-2 ${user.city_id === city.id ? 'fw-bold text-primary active bg-light' : ''}`}
+                        onClick={() => handleSwitchCity(city.id)}
+                      >
+                        <div>
+                          <div>{city.name}</div>
+                          <div className="text-muted small" style={{ fontSize: '0.75rem' }}>{city.state}</div>
+                        </div>
+                        {user.city_id === city.id && <Check size={14} className="text-primary ms-2" />}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             {/* Authenticated User Items */}
             {user ? (

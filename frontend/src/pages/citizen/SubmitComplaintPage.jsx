@@ -9,13 +9,15 @@ import { PlusCircle, AlertCircle, ArrowLeft, Image as ImageIcon } from 'lucide-r
 
 const SubmitComplaintPage = () => {
   const { t } = useTranslation()
-  const { user } = useAuth()
+  const { user, updateProfile } = useAuth()
   const navigate = useNavigate()
 
   const [cities, setCities] = useState([])
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [cityAutoDetectedMsg, setCityAutoDetectedMsg] = useState(null)
+  const [updateProfileCity, setUpdateProfileCity] = useState(false)
 
   // Form states
   const [title, setTitle] = useState('')
@@ -70,6 +72,25 @@ const SubmitComplaintPage = () => {
     setLatitude(loc.latitude)
     setLongitude(loc.longitude)
     setAddress(loc.address)
+
+    // Auto-detect matching city from reverse-geocoded address
+    if (loc.city || loc.address) {
+      const fullAddr = ((loc.city || '') + ' ' + (loc.address || '')).toLowerCase()
+      const matched = cities.find(c => {
+        const cNameLower = c.name.toLowerCase()
+        const cSlug = c.slug.toLowerCase()
+        return fullAddr.includes(cSlug) ||
+               fullAddr.includes(cNameLower.split(' ')[0]) ||
+               (cSlug === 'navi-mumbai' && (fullAddr.includes('navi mumbai') || fullAddr.includes('vashi') || fullAddr.includes('nerul'))) ||
+               (cSlug === 'jhajjar' && fullAddr.includes('jhajjar')) ||
+               (cSlug === 'indore' && fullAddr.includes('indore'))
+      })
+      if (matched && matched.id !== parseInt(cityId)) {
+        setCityId(matched.id)
+        setCityAutoDetectedMsg(`GPS Location matched: Auto-selected ${matched.name}`)
+        setTimeout(() => setCityAutoDetectedMsg(null), 5000)
+      }
+    }
   }
 
   const handleCityChange = (e) => {
@@ -139,6 +160,15 @@ const SubmitComplaintPage = () => {
         })
       }
 
+      // If user chose to update their default home municipality
+      if (updateProfileCity && cityId && parseInt(cityId) !== user?.city_id) {
+        try {
+          await updateProfile({ city_id: parseInt(cityId) })
+        } catch (e) {
+          console.warn('Profile city update ignored', e)
+        }
+      }
+
       navigate(`/complaints/${complaintId}`)
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to submit complaint.')
@@ -195,6 +225,25 @@ const SubmitComplaintPage = () => {
                       <option key={c.id} value={c.id}>{c.name} ({c.state})</option>
                     ))}
                   </select>
+                  {cityAutoDetectedMsg && (
+                    <div className="alert alert-info py-1.5 px-3 small mt-2 mb-1 d-flex align-items-center gap-1.5">
+                      <span>📍 {cityAutoDetectedMsg}</span>
+                    </div>
+                  )}
+                  {user && cityId && parseInt(cityId) !== user.city_id && (
+                    <div className="form-check mt-2">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        id="updateDefaultCity"
+                        checked={updateProfileCity}
+                        onChange={(e) => setUpdateProfileCity(e.target.checked)}
+                      />
+                      <label className="form-check-label small text-muted" htmlFor="updateDefaultCity">
+                        Set this municipality as my default home city
+                      </label>
+                    </div>
+                  )}
                 </div>
                 <div className="col-md-6">
                   <label className="form-label small fw-semibold">{t('form.category')}</label>

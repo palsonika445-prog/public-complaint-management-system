@@ -24,6 +24,7 @@ const AnonymousSubmitPage = () => {
   const [longitude, setLongitude] = useState(75.8577)
   const [address, setAddress] = useState('')
   const [photoFile, setPhotoFile] = useState(null)
+  const [cityAutoDetectedMsg, setCityAutoDetectedMsg] = useState(null)
 
   // Duplication modal
   const [potentialDuplicates, setPotentialDuplicates] = useState([])
@@ -42,7 +43,11 @@ const AnonymousSubmitPage = () => {
         ])
         setCities(citiesRes.data.cities)
         setCategories(catsRes.data.categories)
-        if (citiesRes.data.cities.length > 0) setCityId(citiesRes.data.cities[0].id)
+        if (citiesRes.data.cities.length > 0) {
+          setCityId(citiesRes.data.cities[0].id)
+          setLatitude(citiesRes.data.cities[0].latitude)
+          setLongitude(citiesRes.data.cities[0].longitude)
+        }
         if (catsRes.data.categories.length > 0) setCategoryId(catsRes.data.categories[0].id)
       } catch (err) {
         console.error(err)
@@ -55,6 +60,35 @@ const AnonymousSubmitPage = () => {
     setLatitude(loc.latitude)
     setLongitude(loc.longitude)
     setAddress(loc.address)
+
+    // Auto-detect matching city from reverse-geocoded address
+    if (loc.city || loc.address) {
+      const fullAddr = ((loc.city || '') + ' ' + (loc.address || '')).toLowerCase()
+      const matched = cities.find(c => {
+        const cNameLower = c.name.toLowerCase()
+        const cSlug = c.slug.toLowerCase()
+        return fullAddr.includes(cSlug) ||
+               fullAddr.includes(cNameLower.split(' ')[0]) ||
+               (cSlug === 'navi-mumbai' && (fullAddr.includes('navi mumbai') || fullAddr.includes('vashi') || fullAddr.includes('nerul'))) ||
+               (cSlug === 'jhajjar' && fullAddr.includes('jhajjar')) ||
+               (cSlug === 'indore' && fullAddr.includes('indore'))
+      })
+      if (matched && matched.id !== parseInt(cityId)) {
+        setCityId(matched.id)
+        setCityAutoDetectedMsg(`GPS Location matched: Auto-selected ${matched.name}`)
+        setTimeout(() => setCityAutoDetectedMsg(null), 5000)
+      }
+    }
+  }
+
+  const handleCityChange = (e) => {
+    const cid = parseInt(e.target.value)
+    setCityId(cid)
+    const selectedCityObj = cities.find(c => c.id === cid)
+    if (selectedCityObj) {
+      setLatitude(selectedCityObj.latitude)
+      setLongitude(selectedCityObj.longitude)
+    }
   }
 
   const handleSubmitAttempt = async (e) => {
@@ -227,12 +261,17 @@ const AnonymousSubmitPage = () => {
                       className="form-select"
                       required
                       value={cityId}
-                      onChange={(e) => setCityId(e.target.value)}
+                      onChange={handleCityChange}
                     >
                       {cities.map((c) => (
                         <option key={c.id} value={c.id}>{c.name} ({c.state})</option>
                       ))}
                     </select>
+                    {cityAutoDetectedMsg && (
+                      <div className="alert alert-info py-1.5 px-3 small mt-2 mb-1 d-flex align-items-center gap-1.5">
+                        <span>📍 {cityAutoDetectedMsg}</span>
+                      </div>
+                    )}
                   </div>
                   <div className="col-md-6">
                     <label className="form-label small fw-semibold">{t('form.category')}</label>

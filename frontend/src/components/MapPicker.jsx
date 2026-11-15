@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import api from '../services/api'
 import { Navigation, MapPin } from 'lucide-react'
@@ -38,6 +38,17 @@ const LocationMarker = ({ position, setPosition, onLocationChange }) => {
   )
 }
 
+// Controller to fly to position when props change
+const MapViewController = ({ center }) => {
+  const map = useMap()
+  useEffect(() => {
+    if (center && center[0] && center[1]) {
+      map.flyTo(center, 14, { duration: 1.2 })
+    }
+  }, [center, map])
+  return null
+}
+
 const MapPicker = ({ initialLat = 22.7196, initialLng = 75.8577, onSelectLocation, selectedAddress }) => {
   const { t } = useTranslation()
   const [position, setPosition] = useState([initialLat, initialLng])
@@ -60,6 +71,7 @@ const MapPicker = ({ initialLat = 22.7196, initialLng = 75.8577, onSelectLocatio
         latitude: lat,
         longitude: lng,
         address: formattedAddress,
+        city: addr.city,
         state: addr.state,
       })
     } catch (err) {
@@ -87,9 +99,6 @@ const MapPicker = ({ initialLat = 22.7196, initialLng = 75.8577, onSelectLocatio
         setPosition([lat, lng])
         setLocating(false)
         handleLocationChange(lat, lng)
-        if (mapRef.current) {
-          mapRef.current.flyTo([lat, lng], 16)
-        }
       },
       (err) => {
         setLocating(false)
@@ -101,7 +110,7 @@ const MapPicker = ({ initialLat = 22.7196, initialLng = 75.8577, onSelectLocatio
 
   return (
     <div className="w-100">
-      <div className="d-flex justify-content-between align-items-center mb-2">
+      <div className="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
         <label className="form-label fw-semibold mb-0 small text-muted">
           <MapPin size={15} className="me-1 text-primary" />
           Click or drag marker on map to pinpoint exact location
@@ -135,6 +144,7 @@ const MapPicker = ({ initialLat = 22.7196, initialLng = 75.8577, onSelectLocatio
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
+          <MapViewController center={position} />
           <LocationMarker
             position={position}
             setPosition={setPosition}

@@ -122,8 +122,8 @@ const CitizenComplaintDetailPage = () => {
                   <span className="badge bg-light text-secondary border small">{complaint.category_name}</span>
                   <span className="badge bg-light text-secondary border small">{complaint.city_name}</span>
                   <PriorityBadge priority={complaint.priority} />
-                  <span className="badge bg-slate-100 text-slate-600 border small">
-                    {complaint.visibility === 'public' ? 'Public' : 'Private'}
+                  <span className="badge bg-light text-dark border small">
+                    {complaint.visibility === 'private' ? 'Private' : 'Public'}
                   </span>
                 </div>
               </div>

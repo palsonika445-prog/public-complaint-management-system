@@ -126,7 +126,7 @@ const RegisterPage = () => {
 
               <div className="row g-2 mb-3">
                 <div className="col-md-6">
-                  <label className="form-label small fw-semibold text-slate-700">City / Municipality</label>
+                  <label className="form-label small fw-semibold text-slate-700">Home City / Municipality</label>
                   <select
                     name="city_id"
                     className="form-select"
@@ -138,6 +138,9 @@ const RegisterPage = () => {
                       <option key={c.id} value={c.id}>{c.name} ({c.state})</option>
                     ))}
                   </select>
+                  <small className="text-muted d-block mt-1" style={{ fontSize: '0.73rem' }}>
+                    *You can switch municipality anytime or file complaints for any city.
+                  </small>
                 </div>
                 <div className="col-md-6">
                   <label className="form-label small fw-semibold text-slate-700">Preferred Language</label>
