@@ -68,3 +68,30 @@ def test_password_reset_flow(client):
     # Verify new login works
     login_resp = client.post("/api/auth/login", json={"email": "citizen_a@test.com", "password": "NewSecretPassword@123"})
     assert login_resp.status_code == 200
+
+
+def test_otp_login_flow(client):
+    # Test send-otp with mobile number
+    send_resp = client.post("/api/auth/send-otp", json={"identifier": "9876543210"})
+    assert send_resp.status_code == 200
+    data = send_resp.get_json()
+    assert "demo_otp" in data
+    otp = data["demo_otp"]
+    assert len(otp) == 6
+
+    # Test verify-otp with invalid code
+    bad_verify = client.post("/api/auth/verify-otp", json={"identifier": "9876543210", "otp": "000000"})
+    assert bad_verify.status_code == 400
+
+    # Test verify-otp with valid code
+    good_verify = client.post("/api/auth/verify-otp", json={"identifier": "9876543210", "otp": otp})
+    assert good_verify.status_code == 200
+    user_data = good_verify.get_json()
+    assert "access_token" in user_data
+    assert user_data["user"]["role"] == "citizen"
+
+    # Test master demo OTP '123456' with existing email
+    master_verify = client.post("/api/auth/verify-otp", json={"identifier": "citizen_a@test.com", "otp": "123456"})
+    assert master_verify.status_code == 200
+    assert "access_token" in master_verify.get_json()
+

@@ -46,6 +46,20 @@ export const AuthProvider = ({ children }) => {
     return user
   }
 
+  const loginWithOtp = async (identifier, otp) => {
+    const res = await api.post('/auth/verify-otp', { identifier, otp })
+    const { access_token, user } = res.data
+    localStorage.setItem('pcms_token', access_token)
+    localStorage.setItem('pcms_user', JSON.stringify(user))
+    setToken(access_token)
+    setUser(user)
+    if (user.preferred_language) {
+      i18n.changeLanguage(user.preferred_language)
+      localStorage.setItem('pcms_language', user.preferred_language)
+    }
+    return user
+  }
+
   const register = async (userData) => {
     const res = await api.post('/auth/register', userData)
     const { access_token, user } = res.data
@@ -71,7 +85,7 @@ export const AuthProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout, updateProfile }}>
+    <AuthContext.Provider value={{ user, token, loading, login, loginWithOtp, register, logout, updateProfile }}>
       {children}
     </AuthContext.Provider>
   )

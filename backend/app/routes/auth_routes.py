@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from marshmallow import ValidationError
+import random
+import time
 from app.extensions import db
 from app.models.user import User
 from app.models.city import City
@@ -13,6 +15,10 @@ register_schema = RegisterSchema()
 login_schema = LoginSchema()
 reset_req_schema = PasswordResetRequestSchema()
 reset_conf_schema = PasswordResetConfirmSchema()
+
+# In-memory OTP storage: identifier -> {"code": "123456", "expires_at": timestamp}
+OTP_STORE = {}
+
 
 @auth_bp.route("/register", methods=["POST"])
 def register():
@@ -147,3 +153,115 @@ def password_reset_confirm():
     user.set_password(validated["new_password"])
     db.session.commit()
     return jsonify({"message": "Password has been reset successfully. You can now login with your new password."}), 200
+
+
+@auth_bp.route("/send-otp", methods=["POST"])
+def send_otp():
+    data = request.get_json() or {}
+    identifier = str(data.get("identifier", "")).strip()
+
+    if not identifier:
+        return jsonify({"error": "Please provide an email or 10-digit mobile number"}), 400
+
+    # Clean identifier
+    is_email = "@" in identifier
+    norm_identifier = identifier.lower() if is_email else "".join(filter(str.isdigit, identifier))
+    if not is_email and len(norm_identifier) < 10:
+        return jsonify({"error": "Please provide a valid 10-digit mobile number or email address"}), 400
+
+    # Look up existing user if any
+    user = None
+    if is_email:
+        user = User.query.filter_by(email=norm_identifier).first()
+    else:
+        # Match by phone ending or exact
+        user = User.query.filter(User.phone.like(f"%{norm_identifier[-10:]}")).first()
+
+    # Generate 6-digit OTP code
+    otp_code = f"{random.randint(100000, 999999):06d}"
+    OTP_STORE[norm_identifier] = {
+        "code": otp_code,
+        "expires_at": time.time() + 300,  # 5 minutes validity
+    }
+
+    return jsonify({
+        "message": f"Verification code sent to {identifier}",
+        "identifier": norm_identifier,
+        "demo_otp": otp_code,
+        "is_existing_user": bool(user),
+        "user_name": user.full_name if user else None,
+        "role": user.role if user else "citizen"
+    }), 200
+
+
+@auth_bp.route("/verify-otp", methods=["POST"])
+def verify_otp():
+    data = request.get_json() or {}
+    identifier = str(data.get("identifier", "")).strip()
+    otp = str(data.get("otp", "")).strip()
+
+    if not identifier or not otp:
+        return jsonify({"error": "Identifier and OTP code are required"}), 400
+
+    is_email = "@" in identifier
+    norm_identifier = identifier.lower() if is_email else "".join(filter(str.isdigit, identifier))
+
+    # Verification: check OTP_STORE or master demo fallback '123456'
+    valid = False
+    stored = OTP_STORE.get(norm_identifier)
+    if stored and stored.get("expires_at", 0) > time.time() and stored.get("code") == otp:
+        valid = True
+    elif otp == "123456":
+        valid = True  # Universal demo fallback for seamless teacher demonstrations
+
+    if not valid:
+        return jsonify({"error": "Invalid or expired OTP code. Please try again or click Resend."}), 400
+
+    # Find or auto-provision citizen user
+    user = None
+    if is_email:
+        user = User.query.filter_by(email=norm_identifier).first()
+    else:
+        user = User.query.filter(User.phone.like(f"%{norm_identifier[-10:]}")).first()
+
+    if not user:
+        # Auto-provision new citizen
+        first_city = City.query.order_by(City.id.asc()).first()
+        city_id = first_city.id if first_city else None
+
+        if is_email:
+            name_part = norm_identifier.split("@")[0].replace(".", " ").title()
+            user = User(
+                email=norm_identifier,
+                full_name=f"{name_part}",
+                role="citizen",
+                city_id=city_id,
+                is_active=True
+            )
+        else:
+            clean_digits = norm_identifier[-10:]
+            user = User(
+                email=f"citizen_{clean_digits}@pcms.gov.in",
+                phone=clean_digits,
+                full_name=f"Citizen ({clean_digits[-4:]})",
+                role="citizen",
+                city_id=city_id,
+                is_active=True
+            )
+        user.set_password("Citizen@123")
+        db.session.add(user)
+        db.session.commit()
+
+    if not user.is_active:
+        return jsonify({"error": "Your account is deactivated. Please contact municipal support."}), 403
+
+    # Clean up OTP after successful login
+    OTP_STORE.pop(norm_identifier, None)
+
+    access_token = create_access_token(identity=str(user.id))
+    return jsonify({
+        "message": "OTP verified successfully. Login successful.",
+        "access_token": access_token,
+        "user": user.to_dict(include_private=True)
+    }), 200
+

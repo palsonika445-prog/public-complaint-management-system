@@ -23,6 +23,7 @@ describe('PCMS Frontend Core Verification', () => {
     expect(screen.getByText(/Quick Demo Credentials/i)).toBeInTheDocument()
     expect(screen.getByPlaceholderText(/name@example.com/i)).toBeInTheDocument()
     expect(screen.getByPlaceholderText(/••••••••/i)).toBeInTheDocument()
+    expect(screen.getAllByText(/Instant OTP/i).length).toBeGreaterThanOrEqual(1)
   })
 
   it('renders landing page with civic hero title and action links', async () => {
