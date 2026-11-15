@@ -42,7 +42,7 @@ const ReportsPage = () => {
       if (isOverdue) params.append('is_overdue', isOverdue)
 
       const token = localStorage.getItem('pcms_token')
-      const response = await fetch(`/api/reports/export-csv?${params.toString()}`, {
+      const response = await fetch(`${api.defaults.baseURL}/reports/export-csv?${params.toString()}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       const blob = await response.blob()
