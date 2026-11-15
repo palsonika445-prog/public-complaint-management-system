@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import api from '../../services/api'
 import { Building2, Plus, CheckCircle, XCircle, MapPin } from 'lucide-react'
+import { ALL_INDIAN_STATES, getCitiesForState } from '../../data/indiaLocations'
 
 const CityManagePage = () => {
   const { t } = useTranslation()
@@ -23,6 +24,8 @@ const CityManagePage = () => {
   })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
+
+  const availableCitiesForState = getCitiesForState(formData.state)
 
   const fetchCities = async () => {
     try {
@@ -160,17 +163,68 @@ const CityManagePage = () => {
               <form onSubmit={handleCreateCity}>
                 <div className="modal-body">
                   {error && <div className="alert alert-danger py-2 small mb-3">{error}</div>}
+                  {/* 1. STATE FIRST */}
                   <div className="row g-3 mb-3">
                     <div className="col-md-6">
-                      <label className="form-label small fw-semibold">City / Corporation Name *</label>
+                      <label className="form-label small fw-semibold">1. State / Union Territory *</label>
+                      <input
+                        type="text"
+                        list="super-admin-states"
+                        className="form-control"
+                        required
+                        placeholder="Search State (e.g. Haryana, Maharashtra...)"
+                        value={formData.state}
+                        onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                        autoComplete="off"
+                      />
+                      <datalist id="super-admin-states">
+                        {ALL_INDIAN_STATES.map((s) => (
+                          <option key={s} value={s} />
+                        ))}
+                      </datalist>
+                    </div>
+                    <div className="col-md-6">
+                      <label className="form-label small fw-semibold">Helpline Contact Number</label>
                       <input
                         type="text"
                         className="form-control"
-                        required
-                        placeholder="e.g. Pune Municipal Corporation"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        placeholder="020-25501000 or 1800-xxx-xxxx"
+                        value={formData.helpline_number}
+                        onChange={(e) => setFormData({ ...formData, helpline_number: e.target.value })}
                       />
+                    </div>
+                  </div>
+
+                  {/* 2. CITY SECOND */}
+                  <div className="row g-3 mb-3">
+                    <div className="col-md-6">
+                      <label className="form-label small fw-semibold">2. City / Corporation Name *</label>
+                      <input
+                        type="text"
+                        list="super-admin-cities"
+                        className="form-control"
+                        required
+                        placeholder={formData.state ? `City in ${formData.state} (e.g. Rohtak)` : "Select State above first..."}
+                        value={formData.name}
+                        onChange={(e) => {
+                          const val = e.target.value
+                          const matchedCity = availableCitiesForState.find(c => c.name.toLowerCase() === val.trim().toLowerCase())
+                          const cleanSlug = val.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+                          setFormData({
+                            ...formData,
+                            name: val,
+                            slug: cleanSlug,
+                            latitude: matchedCity ? matchedCity.lat : formData.latitude,
+                            longitude: matchedCity ? matchedCity.lng : formData.longitude,
+                          })
+                        }}
+                        autoComplete="off"
+                      />
+                      <datalist id="super-admin-cities">
+                        {availableCitiesForState.map((c) => (
+                          <option key={c.name} value={c.name} />
+                        ))}
+                      </datalist>
                     </div>
                     <div className="col-md-6">
                       <label className="form-label small fw-semibold">Unique Slug (Identifier) *</label>
@@ -178,33 +232,9 @@ const CityManagePage = () => {
                         type="text"
                         className="form-control"
                         required
-                        placeholder="e.g. pune"
+                        placeholder="e.g. rohtak"
                         value={formData.slug}
                         onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="row g-3 mb-3">
-                    <div className="col-md-6">
-                      <label className="form-label small fw-semibold">State *</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        required
-                        placeholder="e.g. Maharashtra"
-                        value={formData.state}
-                        onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                      />
-                    </div>
-                    <div className="col-md-6">
-                      <label className="form-label small fw-semibold">Helpline Contact Number</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="020-25501000"
-                        value={formData.helpline_number}
-                        onChange={(e) => setFormData({ ...formData, helpline_number: e.target.value })}
                       />
                     </div>
                   </div>
