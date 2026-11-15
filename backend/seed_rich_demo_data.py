@@ -78,10 +78,20 @@ def seed_rich_data():
                 city_id=cities[0].id,
                 phone="9812345678",
                 preferred_language="hi",
-                is_active=True
+                is_active=True,
+                is_aadhaar_verified=True,
+                aadhaar_last4="4819",
+                kyc_document_type="digilocker_aadhaar",
+                kyc_verified_at=datetime.utcnow()
             )
             citizen.set_password("Citizen@123")
             db.session.add(citizen)
+            db.session.commit()
+        else:
+            citizen.is_aadhaar_verified = True
+            citizen.aadhaar_last4 = "4819"
+            citizen.kyc_document_type = "digilocker_aadhaar"
+            citizen.kyc_verified_at = datetime.utcnow()
             db.session.commit()
 
         now = datetime.utcnow()

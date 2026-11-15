@@ -5,7 +5,7 @@ import api from '../../services/api'
 import StatusBadge from '../../components/StatusBadge'
 import PriorityBadge from '../../components/PriorityBadge'
 import Timeline from '../../components/Timeline'
-import { ArrowLeft, CheckCircle2, AlertTriangle, Send, Upload, MapPin, Calendar, Clock, MessageSquare, Image as ImageIcon } from 'lucide-react'
+import { ArrowLeft, CheckCircle2, AlertTriangle, Send, Upload, MapPin, Calendar, Clock, MessageSquare, Image as ImageIcon, ShieldCheck } from 'lucide-react'
 
 const StaffComplaintDetailPage = () => {
   const { id } = useParams()
@@ -170,6 +170,20 @@ const StaffComplaintDetailPage = () => {
                   <span className="badge bg-light text-secondary border small">{complaint.category_name}</span>
                   <span className="badge bg-light text-secondary border small">{complaint.city_name}</span>
                   <PriorityBadge priority={complaint.priority} />
+                  {complaint.citizen_is_aadhaar_verified ? (
+                    <span className="badge bg-emerald-50 text-emerald-800 border border-emerald-300 rounded-pill px-2 py-0.5 small d-inline-flex align-items-center gap-1">
+                      <ShieldCheck size={12} className="text-emerald-600" />
+                      <span>Aadhaar Verified Citizen ({complaint.citizen_trust_score || 98}% Trust)</span>
+                    </span>
+                  ) : complaint.is_anonymous ? (
+                    <span className="badge bg-light text-muted border rounded-pill px-2 py-0.5 small">
+                      Anonymous Source
+                    </span>
+                  ) : (
+                    <span className="badge bg-amber-50 text-amber-800 border border-amber-300 rounded-pill px-2 py-0.5 small">
+                      Standard Citizen
+                    </span>
+                  )}
                   {complaint.is_overdue && (
                     <span className="badge bg-danger text-white d-inline-flex align-items-center gap-1">
                       <AlertTriangle size={12} /> OVERDUE

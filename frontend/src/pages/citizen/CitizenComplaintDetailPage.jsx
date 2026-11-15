@@ -5,7 +5,7 @@ import api from '../../services/api'
 import StatusBadge from '../../components/StatusBadge'
 import PriorityBadge from '../../components/PriorityBadge'
 import Timeline from '../../components/Timeline'
-import { ArrowLeft, Star, AlertTriangle, CheckCircle, RefreshCcw, MapPin, Calendar, Clock, Image as ImageIcon } from 'lucide-react'
+import { ArrowLeft, Star, AlertTriangle, CheckCircle, RefreshCcw, MapPin, Calendar, Clock, Image as ImageIcon, ShieldCheck } from 'lucide-react'
 
 const CitizenComplaintDetailPage = () => {
   const { id } = useParams()
@@ -125,6 +125,12 @@ const CitizenComplaintDetailPage = () => {
                   <span className="badge bg-light text-dark border small">
                     {complaint.visibility === 'private' ? 'Private' : 'Public'}
                   </span>
+                  {complaint.citizen_is_aadhaar_verified && (
+                    <span className="badge bg-emerald-50 text-emerald-800 border border-emerald-300 rounded-pill px-2 py-1 small d-inline-flex align-items-center gap-1">
+                      <ShieldCheck size={12} className="text-emerald-600" />
+                      <span>DigiLocker Verified Citizen (98% Trust)</span>
+                    </span>
+                  )}
                 </div>
               </div>
               <StatusBadge status={complaint.status} />

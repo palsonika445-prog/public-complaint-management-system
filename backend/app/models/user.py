@@ -15,6 +15,13 @@ class User(db.Model):
     department_id = db.Column(db.Integer, db.ForeignKey("departments.id", ondelete="SET NULL"), nullable=True, index=True)
     preferred_language = db.Column(db.String(5), default="en", nullable=False)  # 'en' or 'hi'
     is_active = db.Column(db.Boolean, default=True, nullable=False)
+    
+    # DigiLocker / Aadhaar e-KYC Verification
+    is_aadhaar_verified = db.Column(db.Boolean, default=False, nullable=False)
+    aadhaar_last4 = db.Column(db.String(4), nullable=True)
+    kyc_verified_at = db.Column(db.DateTime, nullable=True)
+    kyc_document_type = db.Column(db.String(30), default=None, nullable=True)
+
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
@@ -43,6 +50,10 @@ class User(db.Model):
             "department_name": self.department.name if self.department else None,
             "preferred_language": self.preferred_language,
             "is_active": self.is_active,
+            "is_aadhaar_verified": self.is_aadhaar_verified,
+            "aadhaar_last4": self.aadhaar_last4,
+            "kyc_verified_at": self.kyc_verified_at.isoformat() if self.kyc_verified_at else None,
+            "kyc_document_type": self.kyc_document_type,
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }
         if include_private:

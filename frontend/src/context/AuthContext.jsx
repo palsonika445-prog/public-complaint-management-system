@@ -84,8 +84,13 @@ export const AuthProvider = ({ children }) => {
     return res.data.user
   }
 
+  const updateUser = (updatedUser) => {
+    setUser(updatedUser)
+    localStorage.setItem('pcms_user', JSON.stringify(updatedUser))
+  }
+
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, loginWithOtp, register, logout, updateProfile }}>
+    <AuthContext.Provider value={{ user, token, loading, login, loginWithOtp, register, logout, updateProfile, updateUser }}>
       {children}
     </AuthContext.Provider>
   )

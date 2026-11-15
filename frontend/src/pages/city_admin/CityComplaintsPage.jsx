@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import api from '../../services/api'
 import StatusBadge from '../../components/StatusBadge'
 import PriorityBadge from '../../components/PriorityBadge'
-import { FileText, AlertTriangle, Search, Filter, ShieldAlert, CheckCircle, ArrowRight } from 'lucide-react'
+import { FileText, AlertTriangle, Search, Filter, ShieldAlert, CheckCircle, ArrowRight, ShieldCheck } from 'lucide-react'
 
 const CityComplaintsPage = () => {
   const { t } = useTranslation()
@@ -203,6 +203,20 @@ const CityComplaintsPage = () => {
                       <small className="text-muted text-truncate d-block" style={{ maxWidth: 220 }}>
                         📍 {c.landmark}
                       </small>
+                    )}
+                    {c.citizen_is_aadhaar_verified ? (
+                      <span className="badge bg-emerald-50 text-emerald-800 border border-emerald-300 rounded-pill px-1.5 py-0.5 mt-0.5 d-inline-flex align-items-center gap-1" style={{ fontSize: '0.65rem' }}>
+                        <ShieldCheck size={11} className="text-emerald-600" />
+                        <span>Aadhaar Verified ({c.citizen_trust_score || 98}% Trust)</span>
+                      </span>
+                    ) : c.is_anonymous ? (
+                      <span className="badge bg-light text-muted border rounded-pill px-1.5 py-0.5 mt-0.5 d-inline-flex align-items-center gap-1" style={{ fontSize: '0.65rem' }}>
+                        <span>Anonymous Source</span>
+                      </span>
+                    ) : (
+                      <span className="badge bg-amber-50 text-amber-800 border border-amber-300 rounded-pill px-1.5 py-0.5 mt-0.5 d-inline-flex align-items-center gap-1" style={{ fontSize: '0.65rem' }}>
+                        <span>Standard Citizen</span>
+                      </span>
                     )}
                   </td>
                   <td>

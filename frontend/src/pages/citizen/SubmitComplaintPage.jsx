@@ -6,7 +6,8 @@ import { useAuth } from '../../context/AuthContext'
 import MapPicker from '../../components/MapPicker'
 import DuplicateModal from '../../components/DuplicateModal'
 import AddCityModal from '../../components/AddCityModal'
-import { PlusCircle, AlertCircle, ArrowLeft, Image as ImageIcon } from 'lucide-react'
+import DigiLockerKycModal from '../../components/DigiLockerKycModal'
+import { PlusCircle, AlertCircle, ArrowLeft, Image as ImageIcon, ShieldCheck, AlertTriangle, Zap } from 'lucide-react'
 
 const SubmitComplaintPage = () => {
   const { t } = useTranslation()
@@ -20,6 +21,7 @@ const SubmitComplaintPage = () => {
   const [cityAutoDetectedMsg, setCityAutoDetectedMsg] = useState(null)
   const [updateProfileCity, setUpdateProfileCity] = useState(false)
   const [showAddCityModal, setShowAddCityModal] = useState(false)
+  const [showKycModal, setShowKycModal] = useState(false)
 
   // Form states
   const [title, setTitle] = useState('')
@@ -212,6 +214,51 @@ const SubmitComplaintPage = () => {
                 <span>{error}</span>
               </div>
             )}
+
+            {/* Citizen Authenticity / DigiLocker Trust Card */}
+            <div className="mb-4">
+              {user?.is_aadhaar_verified ? (
+                <div className="p-3 bg-emerald-50 border border-emerald-300 rounded-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
+                  <div className="d-flex align-items-center gap-2">
+                    <ShieldCheck size={20} className="text-emerald-600 flex-shrink-0" />
+                    <div>
+                      <div className="fw-bold text-emerald-950 small">
+                        Filing as DigiLocker Verified Citizen (Aadhaar **** {user?.aadhaar_last4 || '4819'})
+                      </div>
+                      <div className="text-emerald-800" style={{ fontSize: '0.78rem' }}>
+                        Anti-Spam Verified &bull; Automatic High-Priority SLA Routing
+                      </div>
+                    </div>
+                  </div>
+                  <span className="badge bg-emerald-600 text-white rounded-pill px-2.5 py-1" style={{ fontSize: '0.72rem' }}>
+                    98% Civic Trust Score
+                  </span>
+                </div>
+              ) : (
+                <div className="p-3 bg-amber-50 border border-amber-300 rounded-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
+                  <div className="d-flex align-items-center gap-2">
+                    <AlertTriangle size={20} className="text-amber-600 flex-shrink-0" />
+                    <div>
+                      <div className="fw-bold text-amber-950 small">
+                        Unverified Account (Standard SLA Queue)
+                      </div>
+                      <div className="text-amber-800" style={{ fontSize: '0.78rem' }}>
+                        Verify with DigiLocker to skip spam checks and get fast-track Level 1 resolution.
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-warning text-slate-900 fw-bold px-2.5 py-1 d-flex align-items-center gap-1 shadow-xs"
+                    style={{ fontSize: '0.75rem' }}
+                    onClick={() => setShowKycModal(true)}
+                  >
+                    <Zap size={13} />
+                    <span>Verify Aadhaar</span>
+                  </button>
+                </div>
+              )}
+            </div>
 
             <form onSubmit={handleSubmitAttempt}>
               <div className="row g-3 mb-3">
@@ -418,6 +465,11 @@ const SubmitComplaintPage = () => {
           setLatitude(newCity.latitude)
           setLongitude(newCity.longitude)
         }}
+      />
+
+      <DigiLockerKycModal
+        isOpen={showKycModal}
+        onClose={() => setShowKycModal(false)}
       />
     </div>
   )

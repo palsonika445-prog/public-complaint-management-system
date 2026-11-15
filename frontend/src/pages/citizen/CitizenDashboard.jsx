@@ -6,7 +6,8 @@ import { useAuth } from '../../context/AuthContext'
 import StatCard from '../../components/StatCard'
 import StatusBadge from '../../components/StatusBadge'
 import PriorityBadge from '../../components/PriorityBadge'
-import { PlusCircle, FileText, Clock, CheckCircle, AlertTriangle, ArrowRight, Bell, MapPin, Check } from 'lucide-react'
+import DigiLockerKycModal from '../../components/DigiLockerKycModal'
+import { PlusCircle, FileText, Clock, CheckCircle, AlertTriangle, ArrowRight, Bell, MapPin, Check, ShieldCheck, Zap } from 'lucide-react'
 
 const CitizenDashboard = () => {
   const { t } = useTranslation()
@@ -16,6 +17,7 @@ const CitizenDashboard = () => {
   const [cities, setCities] = useState([])
   const [switchingCity, setSwitchingCity] = useState(false)
   const [switchSuccessMsg, setSwitchSuccessMsg] = useState(null)
+  const [showKycModal, setShowKycModal] = useState(false)
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -110,6 +112,82 @@ const CitizenDashboard = () => {
           <span>{t('nav.fileComplaint')}</span>
         </Link>
       </div>
+
+      {/* DigiLocker / Aadhaar KYC Verification Status Banner */}
+      <div className="mb-4">
+        {user?.is_aadhaar_verified ? (
+          <div className="p-3 bg-emerald-50 border border-emerald-300 rounded-3 shadow-xs d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div className="d-flex align-items-center gap-2.5">
+              <div className="p-2 bg-emerald-100 text-emerald-700 rounded-circle d-inline-flex">
+                <ShieldCheck size={22} />
+              </div>
+              <div>
+                <div className="d-flex align-items-center gap-2">
+                  <span className="fw-bold text-emerald-950 small">
+                    DigiLocker / Aadhaar Verified Citizen
+                  </span>
+                  <span className="badge bg-emerald-600 text-white rounded-pill px-2 py-0.5" style={{ fontSize: '0.68rem' }}>
+                    UIDAI Certified
+                  </span>
+                  <span className="badge bg-white text-emerald-800 border border-emerald-400 rounded-pill px-2 py-0.5" style={{ fontSize: '0.68rem' }}>
+                    98% Civic Trust Score
+                  </span>
+                </div>
+                <div className="text-emerald-800" style={{ fontSize: '0.78rem' }}>
+                  Aadhaar Linked: <strong className="font-monospace">**** **** {user?.aadhaar_last4 || '4819'}</strong> &bull; All complaints fast-tracked to Level 1 SLA Escalation.
+                </div>
+              </div>
+            </div>
+            <button
+              type="button"
+              className="btn btn-sm btn-outline-success px-3 py-1 rounded-pill fw-semibold"
+              style={{ fontSize: '0.78rem' }}
+              onClick={() => setShowKycModal(true)}
+            >
+              View e-KYC Record
+            </button>
+          </div>
+        ) : (
+          <div className="p-3 bg-amber-50 border border-amber-300 rounded-3 shadow-xs d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div className="d-flex align-items-center gap-2.5">
+              <div className="p-2 bg-amber-100 text-amber-700 rounded-circle d-inline-flex">
+                <AlertTriangle size={22} />
+              </div>
+              <div>
+                <div className="d-flex align-items-center gap-2">
+                  <span className="fw-bold text-amber-950 small">
+                    Citizen Identity Verification Pending (e-KYC)
+                  </span>
+                  <span className="badge bg-amber-600 text-white rounded-pill px-2 py-0.5" style={{ fontSize: '0.68rem' }}>
+                    Unverified Source
+                  </span>
+                </div>
+                <div className="text-amber-800" style={{ fontSize: '0.78rem' }}>
+                  Verify your account with DigiLocker / Aadhaar to prove your identity, prevent spam rejection, and get 2x faster municipal resolution.
+                </div>
+              </div>
+            </div>
+            <button
+              type="button"
+              className="btn btn-sm btn-warning text-slate-900 px-3 py-1.5 rounded-3 fw-bold d-inline-flex align-items-center gap-1.5 shadow-xs"
+              style={{ fontSize: '0.8rem' }}
+              onClick={() => setShowKycModal(true)}
+            >
+              <Zap size={14} />
+              <span>Verify via DigiLocker</span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* DigiLocker KYC Verification Modal */}
+      <DigiLockerKycModal
+        isOpen={showKycModal}
+        onClose={() => setShowKycModal(false)}
+        onSuccess={() => {
+          // Modal automatically updates auth user
+        }}
+      />
 
       {/* Metric Cards */}
       <div className="row g-3 mb-4">

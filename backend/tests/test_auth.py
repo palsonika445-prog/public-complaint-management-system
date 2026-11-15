@@ -95,3 +95,39 @@ def test_otp_login_flow(client):
     assert master_verify.status_code == 200
     assert "access_token" in master_verify.get_json()
 
+
+def test_aadhaar_kyc_verification_flow(client):
+    # Register a new citizen
+    reg = client.post("/api/auth/register", json={
+        "email": "kyc_user@test.com",
+        "password": "Password@123",
+        "full_name": "Aadhaar Test Citizen"
+    })
+    assert reg.status_code == 201
+    token = reg.get_json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # Test send aadhaar otp with invalid length
+    bad_send = client.post("/api/auth/aadhaar-send-otp", json={"aadhaar_number": "123"}, headers=headers)
+    assert bad_send.status_code == 400
+
+    # Test send aadhaar otp with valid 12-digit
+    good_send = client.post("/api/auth/aadhaar-send-otp", json={"aadhaar_number": "5489-3210-4819"}, headers=headers)
+    assert good_send.status_code == 200
+    send_data = good_send.get_json()
+    assert send_data["aadhaar_last4"] == "4819"
+    otp = send_data["demo_otp"]
+
+    # Test verify aadhaar otp with bad code
+    bad_verify = client.post("/api/auth/aadhaar-verify-otp", json={"otp": "000000"}, headers=headers)
+    assert bad_verify.status_code == 400
+
+    # Test verify aadhaar otp with good code
+    good_verify = client.post("/api/auth/aadhaar-verify-otp", json={"otp": otp}, headers=headers)
+    assert good_verify.status_code == 200
+    verified_user = good_verify.get_json()["user"]
+    assert verified_user["is_aadhaar_verified"] is True
+    assert verified_user["aadhaar_last4"] == "4819"
+    assert verified_user["kyc_document_type"] == "digilocker_aadhaar"
+
+
