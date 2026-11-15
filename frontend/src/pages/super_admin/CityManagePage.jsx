@@ -53,16 +53,28 @@ const CityManagePage = () => {
     setError(null)
     setSaving(true)
     try {
-      await api.post('/cities', {
-        ...formData,
+      const payload = {
+        name: formData.name.trim(),
+        slug: formData.slug.trim().toLowerCase(),
+        state: formData.state.trim().replace(/[\\/]/g, ''),
+        country: formData.country || 'India',
         latitude: parseFloat(formData.latitude),
         longitude: parseFloat(formData.longitude),
-        boundary_radius_km: parseFloat(formData.boundary_radius_km),
-      })
+        boundary_radius_km: parseFloat(formData.boundary_radius_km) || 25.0,
+        contact_email: formData.contact_email?.trim() || null,
+        helpline_number: formData.helpline_number?.trim() || null,
+      }
+      await api.post('/cities', payload)
       setShowModal(false)
       fetchCities()
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to create city')
+      const errData = err.response?.data
+      if (errData?.errors) {
+        const msg = Object.entries(errData.errors).map(([k, v]) => `${k}: ${v}`).join(', ')
+        setError(msg)
+      } else {
+        setError(errData?.error || 'Failed to create city')
+      }
     } finally {
       setSaving(false)
     }

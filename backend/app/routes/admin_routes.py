@@ -184,6 +184,47 @@ def city_admin_dashboard():
     }), 200
 
 
+@admin_bp.route("/city/complaints", methods=["GET"])
+@role_required("city_admin", "super_admin")
+def list_city_complaints():
+    user = g.current_user
+    city_id = user.city_id if user.role != "super_admin" else request.args.get("city_id", type=int)
+    if not city_id:
+        return jsonify({"error": "city_id is required"}), 400
+
+    query = Complaint.query.filter_by(city_id=city_id)
+
+    q = request.args.get("q", "").strip()
+    if q:
+        search_filter = (
+            (Complaint.complaint_number.ilike(f"%{q}%")) |
+            (Complaint.title.ilike(f"%{q}%")) |
+            (Complaint.description.ilike(f"%{q}%")) |
+            (Complaint.address.ilike(f"%{q}%")) |
+            (Complaint.landmark.ilike(f"%{q}%"))
+        )
+        query = query.filter(search_filter)
+
+    status = request.args.get("status")
+    if status:
+        query = query.filter_by(status=status)
+
+    priority = request.args.get("priority")
+    if priority:
+        query = query.filter_by(priority=priority)
+
+    dept_id = request.args.get("department_id", type=int)
+    if dept_id:
+        query = query.filter_by(assigned_department_id=dept_id)
+
+    overdue = request.args.get("overdue")
+    if overdue == "true":
+        query = query.filter(Complaint.is_overdue == True, Complaint.status.notin_(["resolved", "closed", "rejected"]))
+
+    complaints = query.order_by(Complaint.created_at.desc()).all()
+    return jsonify({"complaints": [c.to_dict(include_internal=True) for c in complaints]}), 200
+
+
 @admin_bp.route("/city/staff", methods=["GET"])
 @role_required("city_admin", "super_admin")
 def list_city_staff():

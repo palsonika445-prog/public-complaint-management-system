@@ -236,3 +236,37 @@ body {
   box-shadow: 0 0 0 2px var(--pcms-blue);
   background-color: var(--pcms-blue);
 }
+
+/* Civic Dark Theme & Slate / Sky Utilities */
+.bg-slate-950 { background-color: #020617 !important; }
+.bg-slate-900 { background-color: #0f172a !important; }
+.bg-slate-800 { background-color: #1e293b !important; }
+.bg-slate-700 { background-color: #334155 !important; }
+.border-slate-800 { border-color: #1e293b !important; }
+.border-slate-700 { border-color: #334155 !important; }
+.border-slate-600 { border-color: #475569 !important; }
+
+.text-slate-100 { color: #f1f5f9 !important; }
+.text-slate-200 { color: #e2e8f0 !important; }
+.text-slate-300 { color: #cbd5e1 !important; }
+.text-slate-400 { color: #94a3b8 !important; }
+.text-slate-500 { color: #64748b !important; }
+.text-slate-600 { color: #475569 !important; }
+.text-slate-700 { color: #334155 !important; }
+.text-slate-800 { color: #1e293b !important; }
+.text-slate-900 { color: #0f172a !important; }
+
+.bg-sky-950 { background-color: #082f49 !important; }
+.bg-sky-900 { background-color: #0c4a6e !important; }
+.bg-sky-50 { background-color: #f0f9ff !important; }
+.text-sky-300 { color: #7dd3fc !important; }
+.text-sky-400 { color: #38bdf8 !important; }
+.border-sky-800 { border-color: #075985 !important; }
+.border-sky-700 { border-color: #0369a1 !important; }
+
+.bg-emerald-50 { background-color: #ecfdf5 !important; }
+.bg-amber-50 { background-color: #fffbeb !important; }
+.bg-purple-50 { background-color: #faf5ff !important; }
+
+.cursor-pointer { cursor: pointer; }
+

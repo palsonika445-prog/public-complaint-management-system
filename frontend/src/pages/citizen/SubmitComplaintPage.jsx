@@ -5,6 +5,7 @@ import api from '../../services/api'
 import { useAuth } from '../../context/AuthContext'
 import MapPicker from '../../components/MapPicker'
 import DuplicateModal from '../../components/DuplicateModal'
+import AddCityModal from '../../components/AddCityModal'
 import { PlusCircle, AlertCircle, ArrowLeft, Image as ImageIcon } from 'lucide-react'
 
 const SubmitComplaintPage = () => {
@@ -18,6 +19,7 @@ const SubmitComplaintPage = () => {
   const [error, setError] = useState(null)
   const [cityAutoDetectedMsg, setCityAutoDetectedMsg] = useState(null)
   const [updateProfileCity, setUpdateProfileCity] = useState(false)
+  const [showAddCityModal, setShowAddCityModal] = useState(false)
 
   // Form states
   const [title, setTitle] = useState('')
@@ -214,16 +216,32 @@ const SubmitComplaintPage = () => {
             <form onSubmit={handleSubmitAttempt}>
               <div className="row g-3 mb-3">
                 <div className="col-md-6">
-                  <label className="form-label small fw-semibold">{t('form.city')}</label>
+                  <div className="d-flex justify-content-between align-items-center mb-1">
+                    <label className="form-label small fw-semibold mb-0">{t('form.city')}</label>
+                    <button
+                      type="button"
+                      className="btn btn-link btn-xs p-0 text-primary text-decoration-none small fw-semibold"
+                      onClick={() => setShowAddCityModal(true)}
+                    >
+                      + Add New City
+                    </button>
+                  </div>
                   <select
                     className="form-select"
                     required
                     value={cityId}
-                    onChange={handleCityChange}
+                    onChange={(e) => {
+                      if (e.target.value === 'ADD_NEW') {
+                        setShowAddCityModal(true)
+                      } else {
+                        handleCityChange(e)
+                      }
+                    }}
                   >
                     {cities.map((c) => (
                       <option key={c.id} value={c.id}>{c.name} ({c.state})</option>
                     ))}
+                    <option value="ADD_NEW">+ Add Another Municipality (नया शहर जोड़ें)...</option>
                   </select>
                   {cityAutoDetectedMsg && (
                     <div className="alert alert-info py-1.5 px-3 small mt-2 mb-1 d-flex align-items-center gap-1.5">
@@ -390,6 +408,17 @@ const SubmitComplaintPage = () => {
           </div>
         </div>
       </div>
+
+      <AddCityModal
+        show={showAddCityModal}
+        onClose={() => setShowAddCityModal(false)}
+        onCityAdded={(newCity) => {
+          setCities(prev => [...prev, newCity])
+          setCityId(newCity.id)
+          setLatitude(newCity.latitude)
+          setLongitude(newCity.longitude)
+        }}
+      />
     </div>
   )
 }

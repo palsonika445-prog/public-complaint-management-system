@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../context/AuthContext'
 import { useNotifications } from '../context/NotificationContext'
 import api from '../services/api'
-import { Globe, Bell, User, LogOut, ShieldAlert, FileText, Check, MapPin } from 'lucide-react'
+import AddCityModal from './AddCityModal'
+import { Globe, Bell, User, LogOut, ShieldAlert, FileText, Check, MapPin, PlusCircle } from 'lucide-react'
 
 const Navbar = () => {
   const { t, i18n } = useTranslation()
@@ -13,12 +14,17 @@ const Navbar = () => {
   const navigate = useNavigate()
   const [cities, setCities] = useState([])
   const [switchingCity, setSwitchingCity] = useState(false)
+  const [showAddCityModal, setShowAddCityModal] = useState(false)
+
+  const fetchCities = () => {
+    api.get('/cities').then(res => {
+      setCities(res.data.cities || [])
+    }).catch(err => console.error(err))
+  }
 
   useEffect(() => {
     if (user && user.role === 'citizen') {
-      api.get('/cities').then(res => {
-        setCities(res.data.cities || [])
-      }).catch(err => console.error(err))
+      fetchCities()
     }
   }, [user])
 
@@ -31,6 +37,11 @@ const Navbar = () => {
     } finally {
       setSwitchingCity(false)
     }
+  }
+
+  const handleCityAdded = async (newCity) => {
+    setCities(prev => [...prev, newCity])
+    await handleSwitchCity(newCity.id)
   }
 
   const handleLanguageChange = (lang) => {
@@ -165,9 +176,25 @@ const Navbar = () => {
                       </button>
                     </li>
                   ))}
+                  <li><hr className="dropdown-divider my-1" /></li>
+                  <li>
+                    <button
+                      className="dropdown-item small text-primary fw-semibold d-flex align-items-center gap-1.5 py-2"
+                      onClick={() => setShowAddCityModal(true)}
+                    >
+                      <PlusCircle size={15} />
+                      <span>+ Add New Municipality / नया शहर जोड़ें</span>
+                    </button>
+                  </li>
                 </ul>
               </div>
             )}
+
+            <AddCityModal
+              show={showAddCityModal}
+              onClose={() => setShowAddCityModal(false)}
+              onCityAdded={handleCityAdded}
+            />
 
             {/* Authenticated User Items */}
             {user ? (

@@ -30,6 +30,7 @@ import StaffComplaintDetailPage from './pages/staff/StaffComplaintDetailPage'
 
 // City Admin Pages
 import CityDashboard from './pages/city_admin/CityDashboard'
+import CityComplaintsPage from './pages/city_admin/CityComplaintsPage'
 import AssignComplaintsPage from './pages/city_admin/AssignComplaintsPage'
 import DepartmentManagePage from './pages/city_admin/DepartmentManagePage'
 import StaffManagePage from './pages/city_admin/StaffManagePage'
@@ -80,7 +81,7 @@ function App() {
       <Route element={<ProtectedRoute allowedRoles={['city_admin', 'super_admin']} />}>
         <Route element={<DashboardLayout />}>
           <Route path="/city-admin/dashboard" element={<CityDashboard />} />
-          <Route path="/city-admin/complaints" element={<StaffComplaintsPage />} />
+          <Route path="/city-admin/complaints" element={<CityComplaintsPage />} />
           <Route path="/city-admin/assign" element={<AssignComplaintsPage />} />
           <Route path="/city-admin/departments" element={<DepartmentManagePage />} />
           <Route path="/city-admin/staff" element={<StaffManagePage />} />
