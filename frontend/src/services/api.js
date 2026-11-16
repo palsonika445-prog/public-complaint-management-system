@@ -1,7 +1,7 @@
 import axios from 'axios'
 
-// Prefer direct backend URL or proxy fallback
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api'
+// Use relative '/api' in browser so Vite proxies to backend seamlessly across LAN / other laptops
+const API_BASE_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' ? '/api' : 'http://localhost:5001/api')
 
 const api = axios.create({
   baseURL: API_BASE_URL,
