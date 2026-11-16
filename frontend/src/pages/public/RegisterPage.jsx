@@ -162,7 +162,7 @@ const RegisterPage = () => {
                   required
                   value={formData.full_name}
                   onChange={handleChange}
-                  placeholder="e.g. Rahul Sharma"
+                  placeholder="e.g. Sonika"
                 />
               </div>
 

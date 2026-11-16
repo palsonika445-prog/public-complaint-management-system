@@ -12,7 +12,7 @@ const WhatsAppNotificationToast = ({ complaint, show, onClose }) => {
 
   const cityName = complaint?.city_name || 'Indore Municipal Corporation'
   const complaintNo = complaint?.complaint_number || 'PCMS-IND-2026-0001'
-  const citizenName = complaint?.citizen_name || 'Rahul ji'
+  const citizenName = complaint?.citizen_name || 'Sonika ji'
   const status = complaint?.status ? complaint.status.replace('_', ' ').toUpperCase() : 'IN PROGRESS'
   const deptName = complaint?.assigned_department_name || 'PWD Civil Works'
 

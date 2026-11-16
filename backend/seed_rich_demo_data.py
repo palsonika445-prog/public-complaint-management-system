@@ -72,8 +72,8 @@ def seed_rich_data():
         citizen = User.query.filter_by(role="citizen").first()
         if not citizen:
             citizen = User(
-                email="citizen.rahul@example.com",
-                full_name="Rahul Gupta",
+                email="citizen.sonika@example.com",
+                full_name="Sonika",
                 role="citizen",
                 city_id=cities[0].id,
                 phone="9812345678",

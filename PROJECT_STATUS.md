@@ -41,6 +41,6 @@ The Public Complaint Management System (PCMS) has been architected, developed, s
 | **City Admin** | `admin.navimumbai@pcms.gov.in` | `Admin@123` | Navi Mumbai Municipal Corp |
 | **Department Staff** | `pwd.staff@indore.gov.in` | `Staff@123` | Public Works Dept (Indore) |
 | **Department Staff** | `sanitation.staff@indore.gov.in` | `Staff@123` | Solid Waste Mgmt (Indore) |
-| **Citizen** | `citizen.rahul@example.com` | `Citizen@123` | Indore |
+| **Citizen** | `citizen.sonika@example.com` | `Citizen@123` | Indore (Sonika) |
 | **Citizen** | `citizen.priya@example.com` | `Citizen@123` | Navi Mumbai |
 | **Anonymous Sample** | Reference: `CMP-2026-000004` | Token: `DEMO-ANON-TOKEN-2026` | Navi Mumbai |

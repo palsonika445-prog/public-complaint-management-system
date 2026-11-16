@@ -84,7 +84,7 @@ const GrievanceReceiptModal = ({ isOpen, onClose, complaint }) => {
                     <tr>
                       <td className="text-muted small py-1" style={{ width: '130px' }}>Complainant:</td>
                       <td className="fw-bold text-slate-900 small py-1">
-                        {complaint.citizen_name || 'Rahul Gupta'}
+                        {complaint.citizen_name || 'Sonika'}
                       </td>
                     </tr>
                     <tr>

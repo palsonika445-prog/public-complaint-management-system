@@ -463,16 +463,16 @@ const LoginPage = () => {
                           <button
                             type="button"
                             className="btn btn-outline-light border text-start p-2 w-100 h-100 rounded-3 hover-shadow-sm text-slate-700 bg-light"
-                            onClick={() => fillDemoPassword('citizen.rahul@example.com', 'Citizen@123')}
+                            onClick={() => fillDemoPassword('citizen.sonika@example.com', 'Citizen@123')}
                           >
                             <div className="d-flex align-items-center gap-1.5 mb-1">
                               <span className="badge bg-primary-subtle text-primary border border-primary-subtle px-1.5 py-0.5" style={{ fontSize: '0.65rem' }}>
                                 Citizen
                               </span>
-                              <span className="fw-semibold small text-truncate">Indore Resident</span>
+                              <span className="fw-semibold small text-truncate">Sonika (Indore)</span>
                             </div>
                             <div className="text-muted text-truncate" style={{ fontSize: '0.72rem' }}>
-                              citizen.rahul@example.com
+                              citizen.sonika@example.com
                             </div>
                           </button>
                         </div>
@@ -606,9 +606,9 @@ const LoginPage = () => {
                               type="button"
                               className="btn btn-sm btn-outline-secondary py-1 px-2.5 rounded-pill"
                               style={{ fontSize: '0.75rem' }}
-                              onClick={() => fillDemoOtp('citizen.rahul@example.com')}
+                              onClick={() => fillDemoOtp('citizen.sonika@example.com')}
                             >
-                              ✉️ Email: <strong>citizen.rahul@example.com</strong>
+                              ✉️ Sonika: <strong>citizen.sonika@example.com</strong>
                             </button>
                             <button
                               type="button"
@@ -751,7 +751,7 @@ const LoginPage = () => {
                           required
                           value={resetEmail}
                           onChange={(e) => setResetEmail(e.target.value)}
-                          placeholder="e.g. citizen.rahul@example.com"
+                          placeholder="e.g. citizen.sonika@example.com"
                         />
                       </div>
                       <button type="submit" className="btn btn-sm btn-outline-primary w-100 py-2 fw-semibold">

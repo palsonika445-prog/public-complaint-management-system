@@ -187,16 +187,16 @@ def seed_database():
         staff_wtr_nm.set_password("Staff@123")
 
         # 4. Citizens
-        citizen_rahul = User(
-            email="citizen.rahul@example.com",
-            full_name="Rahul Gupta",
+        citizen_sonika = User(
+            email="citizen.sonika@example.com",
+            full_name="Sonika",
             role="citizen",
             city_id=city_indore.id,
             phone="9823012345",
             preferred_language="hi",
             is_active=True,
         )
-        citizen_rahul.set_password("Citizen@123")
+        citizen_sonika.set_password("Citizen@123")
 
         citizen_priya = User(
             email="citizen.priya@example.com",
@@ -212,7 +212,7 @@ def seed_database():
         db.session.add_all([
             super_admin, indore_admin, navimumbai_admin,
             staff_pwd_indore, staff_swm_indore, staff_wtr_nm,
-            citizen_rahul, citizen_priya
+            citizen_sonika, citizen_priya
         ])
         db.session.flush()
 
@@ -239,7 +239,7 @@ def seed_database():
             description="Large craters on the main carriageway causing traffic slowdown and two-wheeler skid hazards.",
             category_id=created_cats[0].id,  # roads
             city_id=city_indore.id,
-            citizen_id=citizen_rahul.id,
+            citizen_id=citizen_sonika.id,
             is_anonymous=False,
             priority="high",
             status="in_progress",
@@ -264,7 +264,7 @@ def seed_database():
             description="Garbage has not been collected for three days, scattering across the road causing foul odor.",
             category_id=created_cats[2].id,  # sanitation
             city_id=city_indore.id,
-            citizen_id=citizen_rahul.id,
+            citizen_id=citizen_sonika.id,
             is_anonymous=False,
             priority="medium",
             status="resolved",
@@ -380,7 +380,7 @@ def seed_database():
         # Feedback for c2
         f2 = ComplaintFeedback(
             complaint_id=c2.id,
-            citizen_id=citizen_rahul.id,
+            citizen_id=citizen_sonika.id,
             rating=5,
             remarks="Prompt response by Indore Municipal Corporation! Bin cleared thoroughly.",
             timely_resolution=True,
@@ -390,7 +390,7 @@ def seed_database():
 
         # Notifications
         n1 = Notification(
-            user_id=citizen_rahul.id,
+            user_id=citizen_sonika.id,
             title="Complaint In Progress",
             message=f"Your complaint {c1.complaint_number} is now in progress.",
             notification_type="status_changed",
@@ -398,7 +398,7 @@ def seed_database():
             is_read=False,
         )
         n2 = Notification(
-            user_id=citizen_rahul.id,
+            user_id=citizen_sonika.id,
             title="Complaint Resolved",
             message=f"Complaint {c2.complaint_number} has been resolved! Please submit feedback.",
             notification_type="complaint_resolved",
@@ -416,7 +416,7 @@ def seed_database():
         db.session.add_all([n1, n2, n3])
 
         # Support vote
-        s1 = ComplaintSupport(complaint_id=c1.id, user_id=citizen_rahul.id)
+        s1 = ComplaintSupport(complaint_id=c1.id, user_id=citizen_sonika.id)
         db.session.add(s1)
 
         db.session.commit()
@@ -426,7 +426,7 @@ def seed_database():
         print("Indore Admin:     admin.indore@pcms.gov.in / Admin@123")
         print("Navi Mumbai Admin: admin.navimumbai@pcms.gov.in / Admin@123")
         print("Indore Staff:     pwd.staff@indore.gov.in / Staff@123")
-        print("Indore Citizen:   citizen.rahul@example.com / Citizen@123")
+        print("Indore Citizen:   citizen.sonika@example.com / Citizen@123")
         print("Navi Mumbai Citizen: citizen.priya@example.com / Citizen@123")
         print("Anonymous Demo:   CMP-2026-000004 with Token DEMO-ANON-TOKEN-2026")
         print("=============================================================")
