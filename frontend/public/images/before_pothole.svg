@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="70%" stop-color="#bae6fd"/>
+      <stop offset="100%" stop-color="#e0f2fe"/>
+    </linearGradient>
+    <linearGradient id="roadGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#475569"/>
+      <stop offset="100%" stop-color="#334155"/>
+    </linearGradient>
+    <radialGradient id="potholeGrad" cx="45%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#020617"/>
+      <stop offset="60%" stop-color="#0f172a"/>
+      <stop offset="90%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#334155"/>
+    </radialGradient>
+    <linearGradient id="curbGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#94a3b8"/>
+      <stop offset="100%" stop-color="#64748b"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Sky -->
+  <rect x="0" y="0" width="800" height="220" fill="url(#skyGrad)"/>
+
+  <!-- Distant Skyline & Trees -->
+  <path d="M 0 220 L 40 180 L 90 220 L 150 170 L 220 220 L 290 190 L 360 220 L 450 175 L 530 220 L 620 185 L 710 220 L 800 170 L 800 220 Z" fill="#0284c7" opacity="0.25"/>
+  <!-- Lush Green Trees on Horizon -->
+  <circle cx="80" cy="205" r="35" fill="#15803d"/>
+  <circle cx="120" cy="210" r="28" fill="#166534"/>
+  <circle cx="680" cy="205" r="35" fill="#15803d"/>
+  <circle cx="730" cy="210" r="30" fill="#166534"/>
+  <rect x="0" y="215" width="800" height="15" fill="#15803d"/>
+
+  <!-- Left & Right Sidewalks (Perspective) -->
+  <polygon points="0,230 280,230 120,500 0,500" fill="url(#curbGrad)"/>
+  <polygon points="520,230 800,230 800,500 680,500" fill="url(#curbGrad)"/>
+
+  <!-- Main Asphalt Road Surface -->
+  <polygon points="280,230 520,230 680,500 120,500" fill="url(#roadGrad)"/>
+
+  <!-- Faded/Worn Lane Divider Markings -->
+  <polygon points="395,240 405,240 407,270 393,270" fill="#fef08a" opacity="0.6"/>
+  <polygon points="392,290 408,290 411,335 389,335" fill="#fef08a" opacity="0.6"/>
+  <polygon points="387,365 413,365 418,430 382,430" fill="#fef08a" opacity="0.4"/>
+
+  <!-- DEEP CRATER POTHOLE -->
+  <!-- Outer Broken Asphalt Edge & Cracks -->
+  <path d="M 280 340 Q 320 320 400 325 Q 490 320 540 355 Q 560 395 500 425 Q 410 445 340 435 Q 260 415 280 340 Z" fill="#1e293b" opacity="0.9"/>
+  <!-- Main Deep Cavity -->
+  <path d="M 295 348 C 340 330, 470 332, 520 360 C 545 390, 485 418, 440 425 C 380 435, 300 410, 295 348 Z" fill="url(#potholeGrad)" filter="url(#shadow)"/>
+  
+  <!-- Exposed Gravel / Stone Rubble in Pothole -->
+  <ellipse cx="380" cy="375" rx="12" ry="7" fill="#64748b"/>
+  <ellipse cx="430" cy="385" rx="16" ry="8" fill="#475569"/>
+  <ellipse cx="340" cy="370" rx="9" ry="5" fill="#94a3b8"/>
+  <ellipse cx="480" cy="378" rx="14" ry="7" fill="#64748b"/>
+  <ellipse cx="410" cy="398" rx="18" ry="9" fill="#334155"/>
+  <ellipse cx="365" cy="395" rx="10" ry="6" fill="#94a3b8"/>
+
+  <!-- Radiating Cracks -->
+  <path d="M 295 350 L 240 335 L 210 345 M 240 335 L 255 315" stroke="#0f172a" stroke-width="3" fill="none" opacity="0.8"/>
+  <path d="M 525 365 L 590 355 L 630 370 M 590 355 L 605 330" stroke="#0f172a" stroke-width="3" fill="none" opacity="0.8"/>
+  <path d="M 440 425 L 460 465 L 490 480" stroke="#0f172a" stroke-width="4" fill="none" opacity="0.8"/>
+  <path d="M 330 425 L 290 460 L 260 475" stroke="#0f172a" stroke-width="4" fill="none" opacity="0.8"/>
+
+  <!-- Traffic Hazard Caution Cone -->
+  <g transform="translate(490, 275)">
+    <!-- Base -->
+    <polygon points="10,65 60,65 50,75 0,75" fill="#1e293b"/>
+    <!-- Cone Body -->
+    <polygon points="30,5 40,5 55,65 15,65" fill="#f97316"/>
+    <!-- Reflective Stripes -->
+    <polygon points="26,22 44,22 47,33 23,33" fill="#ffffff"/>
+    <polygon points="21,43 49,43 52,53 18,53" fill="#ffffff"/>
+  </g>
+
+  <!-- Photo Header Overlay: Red Alert Stamp -->
+  <rect x="20" y="20" width="340" height="42" rx="8" fill="#991b1b" opacity="0.92"/>
+  <text x="35" y="46" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="14" font-weight="bold" fill="#ffffff">
+    🚩 BEFORE: DEEP POTHOLE REPORTED
+  </text>
+
+  <!-- Bottom Location Stamp -->
+  <rect x="20" y="445" width="460" height="36" rx="6" fill="#0f172a" opacity="0.9"/>
+  <text x="32" y="468" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12" fill="#e2e8f0">
+    📍 Ward 14, A.B. Road, Indore &bull; GPS: 22.7196° N, 75.8577° E
+  </text>
+</svg>
