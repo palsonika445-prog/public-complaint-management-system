@@ -2,15 +2,12 @@ import React, { useState } from 'react'
 import {
   CheckCircle2,
   ShieldCheck,
-  MapPin,
-  Calendar,
   UserCheck,
-  Eye,
   Maximize2,
   X,
-  Sparkles,
   Check
 } from 'lucide-react'
+import { BeforeRepairGraphic, AfterRepairGraphic } from './EvidenceGraphics'
 
 const ResolutionEvidenceCard = ({ complaint }) => {
   const [activeZoomPhoto, setActiveZoomPhoto] = useState(null)
@@ -22,13 +19,6 @@ const ResolutionEvidenceCard = ({ complaint }) => {
   // Find user-uploaded attachments if any
   const beforeAtt = complaint.attachments?.find(a => !a.is_resolution_evidence)
   const afterAtt = complaint.attachments?.find(a => a.is_resolution_evidence)
-
-  // Decent, high-clarity local SVG images that load instantly & 100% offline
-  const defaultBeforeUrl = '/images/before_pothole.svg'
-  const defaultAfterUrl = '/images/after_repair.svg'
-
-  const beforePhotoUrl = beforeAtt?.download_url || defaultBeforeUrl
-  const afterPhotoUrl = afterAtt?.download_url || defaultAfterUrl
 
   return (
     <div className="civic-card p-4 mb-4 border border-emerald-300 bg-white shadow-sm rounded-4 overflow-hidden">
@@ -62,7 +52,7 @@ const ResolutionEvidenceCard = ({ complaint }) => {
       <div className="row g-3 mb-3">
         {/* 1. BEFORE COLUMN */}
         <div className="col-md-6">
-          <div className="rounded-3 border overflow-hidden bg-slate-50 h-100 d-flex flex-column justify-content-between shadow-xs">
+          <div className="rounded-3 border overflow-hidden bg-white h-100 d-flex flex-column justify-content-between shadow-xs">
             <div className="p-2.5 bg-danger-subtle border-bottom d-flex justify-content-between align-items-center">
               <span className="badge bg-danger text-white fw-bold d-inline-flex align-items-center gap-1" style={{ fontSize: '0.7rem' }}>
                 <span>1. BEFORE REPAIR</span>
@@ -71,27 +61,34 @@ const ResolutionEvidenceCard = ({ complaint }) => {
                 type="button"
                 className="btn btn-xs btn-link text-danger p-0 text-decoration-none fw-semibold d-inline-flex align-items-center gap-1"
                 style={{ fontSize: '0.72rem' }}
-                onClick={() => setActiveZoomPhoto({ url: beforePhotoUrl, title: 'Before Resolution: Citizen Grievance Photo', type: 'before' })}
+                onClick={() => setActiveZoomPhoto({ type: 'before', title: 'Before Resolution: Citizen Grievance Photo' })}
               >
                 <Maximize2 size={12} />
                 <span>Enlarge</span>
               </button>
             </div>
 
-            {/* Photo Container - Clean high-contrast background */}
+            {/* Photo Container - Clean rendered graphic */}
             <div
               className="position-relative overflow-hidden cursor-pointer"
-              style={{ height: '220px', backgroundColor: '#f1f5f9' }}
-              onClick={() => setActiveZoomPhoto({ url: beforePhotoUrl, title: 'Before Resolution: Citizen Grievance Photo', type: 'before' })}
+              style={{ height: '230px' }}
+              onClick={() => setActiveZoomPhoto({ type: 'before', title: 'Before Resolution: Citizen Grievance Photo' })}
             >
-              <img
-                src={beforePhotoUrl}
-                alt="Before Resolution"
-                className="w-100 h-100 object-fit-cover transition-all"
-                onError={(e) => {
-                  e.target.src = defaultBeforeUrl
-                }}
-              />
+              {beforeAtt?.download_url ? (
+                <img
+                  src={beforeAtt.download_url}
+                  alt="Before Resolution"
+                  className="w-100 h-100 object-fit-cover"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none'
+                    const fb = e.currentTarget.nextElementSibling
+                    if (fb) fb.style.display = 'block'
+                  }}
+                />
+              ) : null}
+              <div style={{ display: beforeAtt?.download_url ? 'none' : 'block', width: '100%', height: '100%' }}>
+                <BeforeRepairGraphic />
+              </div>
               <span className="position-absolute bottom-0 start-0 m-2 badge bg-dark/85 text-white small px-2 py-1 backdrop-blur shadow-xs">
                 📍 {complaint.landmark || 'Incident Site Coordinates'}
               </span>
@@ -108,9 +105,9 @@ const ResolutionEvidenceCard = ({ complaint }) => {
           </div>
         </div>
 
-        {/* 2. AFTER COLUMN (Bright, Decent, Clean Photo) */}
+        {/* 2. AFTER COLUMN (Bright, Clear, Newly Paved Road) */}
         <div className="col-md-6">
-          <div className="rounded-3 border overflow-hidden bg-slate-50 h-100 d-flex flex-column justify-content-between shadow-xs">
+          <div className="rounded-3 border overflow-hidden bg-white h-100 d-flex flex-column justify-content-between shadow-xs">
             <div className="p-2.5 bg-success-subtle border-bottom d-flex justify-content-between align-items-center">
               <span className="badge bg-success text-white fw-bold d-inline-flex align-items-center gap-1" style={{ fontSize: '0.7rem' }}>
                 <Check size={12} />
@@ -120,27 +117,34 @@ const ResolutionEvidenceCard = ({ complaint }) => {
                 type="button"
                 className="btn btn-xs btn-link text-success p-0 text-decoration-none fw-semibold d-inline-flex align-items-center gap-1"
                 style={{ fontSize: '0.72rem' }}
-                onClick={() => setActiveZoomPhoto({ url: afterPhotoUrl, title: 'After Resolution: Municipal Work Completed', type: 'after' })}
+                onClick={() => setActiveZoomPhoto({ type: 'after', title: 'After Resolution: Municipal Work Completed' })}
               >
                 <Maximize2 size={12} />
                 <span>Enlarge</span>
               </button>
             </div>
 
-            {/* Photo Container - Clean high-contrast background */}
+            {/* Photo Container - Clean rendered graphic */}
             <div
               className="position-relative overflow-hidden cursor-pointer"
-              style={{ height: '220px', backgroundColor: '#f1f5f9' }}
-              onClick={() => setActiveZoomPhoto({ url: afterPhotoUrl, title: 'After Resolution: Municipal Work Completed', type: 'after' })}
+              style={{ height: '230px' }}
+              onClick={() => setActiveZoomPhoto({ type: 'after', title: 'After Resolution: Municipal Work Completed' })}
             >
-              <img
-                src={afterPhotoUrl}
-                alt="After Resolution"
-                className="w-100 h-100 object-fit-cover transition-all"
-                onError={(e) => {
-                  e.target.src = defaultAfterUrl
-                }}
-              />
+              {afterAtt?.download_url ? (
+                <img
+                  src={afterAtt.download_url}
+                  alt="After Resolution"
+                  className="w-100 h-100 object-fit-cover"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none'
+                    const fb = e.currentTarget.nextElementSibling
+                    if (fb) fb.style.display = 'block'
+                  }}
+                />
+              ) : null}
+              <div style={{ display: afterAtt?.download_url ? 'none' : 'block', width: '100%', height: '100%' }}>
+                <AfterRepairGraphic />
+              </div>
               <span className="position-absolute bottom-0 start-0 m-2 badge bg-emerald-800 text-white small px-2 py-1 shadow-xs">
                 ✓ Road Repaved &amp; Roller Compacted
               </span>
@@ -196,13 +200,12 @@ const ResolutionEvidenceCard = ({ complaint }) => {
                   <X size={20} />
                 </button>
               </div>
-              <div className="modal-body p-0 bg-slate-100 text-center">
-                <img
-                  src={activeZoomPhoto.url}
-                  alt="High-Res Evidence"
-                  className="w-100 object-fit-contain"
-                  style={{ maxHeight: '70vh' }}
-                />
+              <div className="modal-body p-0 bg-slate-900 text-center" style={{ minHeight: '380px' }}>
+                {activeZoomPhoto.type === 'before' ? (
+                  <BeforeRepairGraphic style={{ maxHeight: '72vh' }} />
+                ) : (
+                  <AfterRepairGraphic style={{ maxHeight: '72vh' }} />
+                )}
               </div>
               <div className="p-3 bg-white border-top d-flex justify-content-between align-items-center">
                 <span className="small text-muted">
