@@ -8,7 +8,7 @@ import Timeline from '../../components/Timeline'
 import ResolutionEvidenceCard from '../../components/ResolutionEvidenceCard'
 import GrievanceReceiptModal from '../../components/GrievanceReceiptModal'
 import WhatsAppNotificationToast from '../../components/WhatsAppNotificationToast'
-import { ArrowLeft, Star, AlertTriangle, CheckCircle, RefreshCcw, MapPin, Calendar, Clock, Image as ImageIcon, ShieldCheck, Printer, MessageSquare } from 'lucide-react'
+import { ArrowLeft, Star, AlertTriangle, CheckCircle, RefreshCcw, MapPin, Calendar, Clock, Image as ImageIcon, ShieldCheck, Printer, MessageSquare, Bell, PhoneCall, Send, CheckCircle2 } from 'lucide-react'
 
 const CitizenComplaintDetailPage = () => {
   const { id } = useParams()
@@ -18,6 +18,12 @@ const CitizenComplaintDetailPage = () => {
   const [error, setError] = useState(null)
   const [showReceiptModal, setShowReceiptModal] = useState(false)
   const [showWhatsAppToast, setShowWhatsAppToast] = useState(false)
+
+  // Citizen Inquiry & Reminder state
+  const [sendingReminder, setSendingReminder] = useState(false)
+  const [reminderSentMsg, setReminderSentMsg] = useState(null)
+  const [newInquiry, setNewInquiry] = useState('')
+  const [submittingInquiry, setSubmittingInquiry] = useState(false)
 
   // Feedback Modal state
   const [showFeedbackModal, setShowFeedbackModal] = useState(false)
@@ -79,6 +85,41 @@ const CitizenComplaintDetailPage = () => {
       alert(err.response?.data?.error || 'Failed to reopen complaint')
     } finally {
       setSubmittingReopen(false)
+    }
+  }
+
+  const handleSendReminder = async () => {
+    setSendingReminder(true)
+    try {
+      await api.post(`/complaints/${id}/comments`, {
+        comment: '🔔 CITIZEN REMINDER: Citizen requested an urgent status update and ground action from the assigned municipal team.',
+        is_internal: false,
+      })
+      setReminderSentMsg('Official reminder logged & dispatched to assigned officer!')
+      setTimeout(() => setReminderSentMsg(null), 5000)
+      fetchDetail()
+    } catch (err) {
+      alert(err.response?.data?.error || 'Failed to dispatch reminder.')
+    } finally {
+      setSendingReminder(false)
+    }
+  }
+
+  const handleAddInquiry = async (e) => {
+    e.preventDefault()
+    if (!newInquiry.trim()) return
+    setSubmittingInquiry(true)
+    try {
+      await api.post(`/complaints/${id}/comments`, {
+        comment: newInquiry.trim(),
+        is_internal: false,
+      })
+      setNewInquiry('')
+      fetchDetail()
+    } catch (err) {
+      alert(err.response?.data?.error || 'Failed to send inquiry.')
+    } finally {
+      setSubmittingInquiry(false)
     }
   }
 
@@ -249,10 +290,113 @@ const CitizenComplaintDetailPage = () => {
 
           {/* Before & After Resolution Proof Evidence Card */}
           <ResolutionEvidenceCard complaint={complaint} />
+
+          {/* Citizen Inquiries & Official Responses */}
+          <div className="civic-card p-4 mb-4">
+            <h6 className="fw-bold text-slate-900 mb-3 d-flex align-items-center gap-2">
+              <MessageSquare size={17} className="text-primary" />
+              Citizen Inquiries & Official Progress Updates
+            </h6>
+
+            {/* Post Inquiry Form */}
+            <form onSubmit={handleAddInquiry} className="mb-3">
+              <div className="input-group">
+                <input
+                  type="text"
+                  className="form-control text-slate-800"
+                  placeholder="Need an update? Ask the municipal department or officer..."
+                  value={newInquiry}
+                  onChange={(e) => setNewInquiry(e.target.value)}
+                  disabled={submittingInquiry}
+                />
+                <button
+                  type="submit"
+                  className="btn btn-primary d-flex align-items-center gap-1.5 px-3 fw-semibold"
+                  disabled={submittingInquiry || !newInquiry.trim()}
+                >
+                  <Send size={14} />
+                  <span>{submittingInquiry ? 'Sending...' : 'Send Inquiry'}</span>
+                </button>
+              </div>
+            </form>
+
+            {/* Inquiries / Comments Feed */}
+            <div className="d-flex flex-column gap-2">
+              {!complaint.comments || complaint.comments.length === 0 ? (
+                <p className="text-muted small mb-0 p-2.5 text-center bg-slate-50 border rounded-3">
+                  No citizen inquiries or department notes on this grievance yet.
+                </p>
+              ) : (
+                complaint.comments.map((c) => (
+                  <div
+                    key={c.id}
+                    className={`p-2.5 rounded-3 border small ${
+                      c.author_role === 'citizen' ? 'bg-sky-50 border-sky-200' : 'bg-slate-50 border-slate-200'
+                    }`}
+                  >
+                    <div className="d-flex justify-content-between align-items-center mb-1">
+                      <span className="fw-bold text-slate-900 d-flex align-items-center gap-1">
+                        {c.author_name}
+                        <span className={`badge ${c.author_role === 'citizen' ? 'bg-primary' : 'bg-secondary'}`} style={{ fontSize: '0.62rem' }}>
+                          {c.author_role === 'citizen' ? 'Citizen' : c.author_role}
+                        </span>
+                      </span>
+                      <span className="text-muted" style={{ fontSize: '0.68rem' }}>
+                        {new Date(c.created_at).toLocaleString()}
+                      </span>
+                    </div>
+                    <p className="mb-0 text-slate-800" style={{ lineHeight: '1.4' }}>
+                      {c.comment}
+                    </p>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Sidebar Actions & Timeline */}
         <div className="col-lg-4">
+          {/* Active Grievance Action: Send Reminder & Helpline */}
+          {complaint.status !== 'resolved' && complaint.status !== 'closed' && (
+            <div className="civic-card p-3 mb-4">
+              <h6 className="fw-bold text-slate-900 mb-2 d-flex align-items-center gap-1.5">
+                <Bell size={16} className="text-primary" />
+                No Resolution Yet? Take Action
+              </h6>
+              <p className="small text-muted mb-3" style={{ fontSize: '0.8rem', lineHeight: '1.4' }}>
+                If work is delayed or you need an urgent site progress update, send an official reminder to the assigned officer.
+              </p>
+
+              {reminderSentMsg && (
+                <div className="alert alert-success py-1.5 px-2.5 small mb-2 d-flex align-items-center gap-1.5 rounded-3">
+                  <CheckCircle2 size={15} />
+                  <span style={{ fontSize: '0.78rem' }}>{reminderSentMsg}</span>
+                </div>
+              )}
+
+              <button
+                type="button"
+                className="btn btn-outline-primary btn-sm w-100 d-inline-flex align-items-center justify-content-center gap-1.5 mb-3 fw-bold py-2 shadow-xs"
+                onClick={handleSendReminder}
+                disabled={sendingReminder}
+              >
+                <Bell size={14} />
+                <span>{sendingReminder ? 'Sending...' : '🔔 Send Reminder to Officer (स्मरण पत्र)'}</span>
+              </button>
+
+              <div className="p-2.5 bg-slate-50 border rounded-3 text-start">
+                <div className="fw-semibold text-slate-800 small d-flex align-items-center gap-1 mb-1">
+                  <PhoneCall size={13} className="text-primary" />
+                  <span>Direct Municipal Helpdesk:</span>
+                </div>
+                <div className="text-muted" style={{ fontSize: '0.75rem', lineHeight: '1.45' }}>
+                  📞 CM Helpline: <strong className="text-slate-900">181</strong> (Toll-Free)<br />
+                  🏛️ Control Room: <strong className="text-slate-900">0731-2537111</strong>
+                </div>
+              </div>
+            </div>
+          )}
           {/* Action Card for Resolved complaints */}
           {complaint.status === 'resolved' && (
             <div className="civic-card p-3 mb-4 text-center">
