@@ -107,6 +107,12 @@ const Navbar = () => {
             <li className="nav-item">
               <Link to="/about" className="nav-link">{t('nav.about')}</Link>
             </li>
+            <li className="nav-item">
+              <Link to="/app" className="nav-link d-flex align-items-center gap-1.5 text-sky-300 fw-semibold">
+                <span>📱 Citizen App</span>
+                <span className="badge bg-emerald-400 text-slate-950 px-1.5 py-0.5 rounded-pill" style={{ fontSize: '0.62rem' }}>LIVE</span>
+              </Link>
+            </li>
           </ul>
 
           <div className="d-flex align-items-center gap-3">

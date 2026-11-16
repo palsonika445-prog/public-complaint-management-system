@@ -11,7 +11,8 @@ import {
   ArrowRight,
   Flame,
   Search,
-  EyeOff
+  EyeOff,
+  Smartphone
 } from 'lucide-react'
 import StatusBadge from '../../components/StatusBadge'
 
@@ -59,6 +60,10 @@ const LandingPage = () => {
                 A unified, accountable platform to report potholes, water supply issues, garbage collection, and streetlights directly to your municipal authority.
               </p>
               <div className="d-flex flex-wrap gap-3">
+                <Link to="/app" className="btn btn-warning btn-lg px-4 py-2.5 shadow-sm d-inline-flex align-items-center gap-2 fw-bold text-slate-950">
+                  <Smartphone size={18} />
+                  <span>📱 Citizen Mobile App (PWA)</span>
+                </Link>
                 <Link to="/citizen/submit" className="btn btn-civic btn-lg px-4 py-2.5 shadow-sm d-inline-flex align-items-center gap-2">
                   <span>File a Complaint</span>
                   <ArrowRight size={18} />

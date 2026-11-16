@@ -16,6 +16,7 @@ import LoginPage from './pages/public/LoginPage'
 import RegisterPage from './pages/public/RegisterPage'
 import AnonymousSubmitPage from './pages/public/AnonymousSubmitPage'
 import AnonymousTrackPage from './pages/public/AnonymousTrackPage'
+import MobileAppSimulatorPage from './pages/public/MobileAppSimulatorPage'
 
 // Citizen Pages
 import CitizenDashboard from './pages/citizen/CitizenDashboard'
@@ -57,6 +58,8 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/anonymous/submit" element={<AnonymousSubmitPage />} />
         <Route path="/anonymous/track" element={<AnonymousTrackPage />} />
+        <Route path="/app" element={<MobileAppSimulatorPage />} />
+        <Route path="/mobile-app" element={<MobileAppSimulatorPage />} />
       </Route>
 
       {/* CITIZEN PROTECTED ROUTES */}
