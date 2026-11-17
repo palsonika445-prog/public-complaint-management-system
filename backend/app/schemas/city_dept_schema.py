@@ -4,13 +4,13 @@ class CitySchema(Schema):
     name = fields.String(required=True, validate=validate.Length(min=2, max=100))
     slug = fields.String(required=True, validate=validate.Length(min=2, max=100))
     state = fields.String(required=True, validate=validate.Length(min=2, max=100))
-    country = fields.String(required=False, default="India")
+    country = fields.String(required=False, load_default="India", dump_default="India")
     latitude = fields.Float(required=True)
     longitude = fields.Float(required=True)
-    boundary_radius_km = fields.Float(required=False, default=25.0)
+    boundary_radius_km = fields.Float(required=False, load_default=25.0, dump_default=25.0)
     contact_email = fields.Email(required=False, allow_none=True)
     helpline_number = fields.String(required=False, allow_none=True)
-    is_active = fields.Boolean(required=False, default=True)
+    is_active = fields.Boolean(required=False, load_default=True, dump_default=True)
 
 
 class DepartmentSchema(Schema):
@@ -19,17 +19,17 @@ class DepartmentSchema(Schema):
     description = fields.String(required=False, allow_none=True)
     city_id = fields.Integer(required=True)
     head_user_id = fields.Integer(required=False, allow_none=True)
-    is_active = fields.Boolean(required=False, default=True)
+    is_active = fields.Boolean(required=False, load_default=True, dump_default=True)
 
 
 class CategorySchema(Schema):
     name = fields.String(required=True, validate=validate.Length(min=2, max=100))
     code = fields.String(required=True, validate=validate.Length(min=2, max=50))
     description = fields.String(required=False, allow_none=True)
-    icon = fields.String(required=False, default="alert-circle")
+    icon = fields.String(required=False, load_default="alert-circle", dump_default="alert-circle")
     default_department_code = fields.String(required=False, allow_none=True)
     city_id = fields.Integer(required=False, allow_none=True)
-    is_active = fields.Boolean(required=False, default=True)
+    is_active = fields.Boolean(required=False, load_default=True, dump_default=True)
 
 
 class SLAPolicySchema(Schema):
@@ -38,4 +38,4 @@ class SLAPolicySchema(Schema):
     priority = fields.String(required=True, validate=validate.OneOf(["low", "medium", "high", "critical"]))
     target_resolution_hours = fields.Integer(required=True, validate=validate.Range(min=1, max=720))
     escalation_threshold_hours = fields.Integer(required=True, validate=validate.Range(min=1, max=720))
-    is_active = fields.Boolean(required=False, default=True)
+    is_active = fields.Boolean(required=False, load_default=True, dump_default=True)

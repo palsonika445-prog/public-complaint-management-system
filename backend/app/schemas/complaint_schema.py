@@ -34,14 +34,14 @@ class ComplaintAssignSchema(Schema):
 
 class ComplaintCommentSchema(Schema):
     comment = fields.String(required=True, validate=validate.Length(min=1, max=2000))
-    is_internal = fields.Boolean(required=False, default=False)
+    is_internal = fields.Boolean(required=False, load_default=False, dump_default=False)
 
 
 class FeedbackSchema(Schema):
     rating = fields.Integer(required=True, validate=validate.Range(min=1, max=5))
     remarks = fields.String(required=False, allow_none=True, validate=validate.Length(max=1000))
-    timely_resolution = fields.Boolean(required=False, default=True)
-    staff_behavior = fields.Boolean(required=False, default=True)
+    timely_resolution = fields.Boolean(required=False, load_default=True, dump_default=True)
+    staff_behavior = fields.Boolean(required=False, load_default=True, dump_default=True)
 
 
 class ReopenComplaintSchema(Schema):
@@ -53,4 +53,4 @@ class DuplicateCheckSchema(Schema):
     category_id = fields.Integer(required=True)
     latitude = fields.Float(required=True)
     longitude = fields.Float(required=True)
-    radius_meters = fields.Float(required=False, default=1000.0)
+    radius_meters = fields.Float(required=False, load_default=1000.0, dump_default=1000.0)
